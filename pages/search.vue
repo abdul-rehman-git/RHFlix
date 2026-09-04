@@ -101,19 +101,13 @@
 </template>
 
 <script setup lang="ts">
+import { useTmdb } from '~/composables/useTmdb';
 import type { MediaItem } from '~/types/tmdb';
 
 useSeoMeta({
   title: 'Search Movies & TV Shows - RHFlix',
   ogTitle: 'Search Movies & TV Shows - RHFlix',
-  description: 'Search across millions of movies and TV series on RHFlix.',
-  ogDescription: 'Search across millions of movies and TV series on RHFlix.'
-});
-
-useHead({
-  link: [
-    { rel: 'canonical', href: 'https://reflix.rehmanwebs.com/search' }
-  ]
+  description: 'Search across millions of movies and TV series on RHFlix.'
 });
 
 const route = useRoute();
@@ -169,7 +163,7 @@ const handleInput = () => {
 
   debounceTimer = setTimeout(() => {
     performSearch();
-  }, 400);
+  }, 350);
 };
 
 const selectFilter = (filterId: any) => {

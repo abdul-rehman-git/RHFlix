@@ -5,25 +5,20 @@ const STORAGE_KEY = 'marxi_my_list';
 export const useMyList = () => {
   const myList = useState<MediaItem[]>('marxi_my_list', () => []);
 
-  // Initialize from LocalStorage on client
   onMounted(() => {
-    if (import.meta.client) {
+    if (import.meta.client && myList.value.length === 0) {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed)) {
-            // Filter valid item objects
             myList.value = parsed.filter(item => item && typeof item === 'object' && Boolean(item.id));
           } else {
             localStorage.removeItem(STORAGE_KEY);
           }
         }
       } catch (err) {
-        console.error('Error reading My List from localStorage:', err);
-        try {
-          localStorage.removeItem(STORAGE_KEY);
-        } catch (_) {}
+        console.error('Error reading My List from LocalStorage:', err);
       }
     }
   });
@@ -33,7 +28,7 @@ export const useMyList = () => {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
       } catch (err) {
-        console.error('Error saving My List to localStorage:', err);
+        console.error('Error saving My List to LocalStorage:', err);
       }
     }
   };

@@ -60,19 +60,13 @@
 </template>
 
 <script setup lang="ts">
+import { useMyList } from '~/composables/useMyList';
 import type { MediaItem } from '~/types/tmdb';
 
 useSeoMeta({
   title: 'My Watchlist - RHFlix',
   ogTitle: 'My Watchlist - RHFlix',
-  description: 'View your saved movies and TV shows on RHFlix.',
-  ogDescription: 'View your saved movies and TV shows on RHFlix.'
-});
-
-useHead({
-  link: [
-    { rel: 'canonical', href: 'https://reflix.rehmanwebs.com/my-list' }
-  ]
+  description: 'View your saved movies and TV shows on RHFlix.'
 });
 
 const { myList } = useMyList();

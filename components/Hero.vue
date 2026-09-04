@@ -41,7 +41,7 @@
 
         <!-- Tagline / Overview -->
         <p class="text-gray-300 text-xs sm:text-base line-clamp-2 sm:line-clamp-3 leading-relaxed max-w-xl drop-shadow">
-          {{ item.overview || 'Stream your favorite movies and series in full HD on RHFlix.' }}
+          {{ item.overview || 'Stream your favorite movies and series in full HD on Marxi.' }}
         </p>
 
         <!-- Action Buttons -->

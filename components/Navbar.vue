@@ -15,7 +15,7 @@
           <!-- Logo -->
           <NuxtLink to="/" class="flex items-center space-x-2 group">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-marxi-accent to-red-500 flex items-center justify-center shadow-glow-red group-hover:scale-105 transition-transform duration-300">
-              <span class="font-display font-black text-lg text-white tracking-tighter">RH</span>
+              <span class="font-display font-black text-base text-white tracking-tighter">RH</span>
             </div>
             <span class="font-display font-extrabold text-2xl tracking-tight text-white group-hover:text-red-400 transition-colors">
               RHFlix<span class="text-marxi-accent">.</span>

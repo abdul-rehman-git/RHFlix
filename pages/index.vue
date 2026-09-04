@@ -1,12 +1,12 @@
 <template>
   <div>
-    <!-- Hero Section -->
+    <!-- Hero Banner Section -->
     <LoadingSkeleton v-if="loadingHero" type="hero" />
     <Hero v-else-if="featuredItem" :item="featuredItem" />
 
     <div class="space-y-4 sm:space-y-6 pb-16 pt-4 sm:pt-6">
       
-      <!-- Continue Watching Row (if LocalStorage history exists) -->
+      <!-- Continue Watching Row -->
       <section v-if="watchHistoryItems && watchHistoryItems.length > 0" class="py-3 sm:py-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center justify-between mb-3 sm:mb-4">
@@ -28,8 +28,19 @@
             <div 
               v-for="item in watchHistoryItems" 
               :key="`${item.type}-${item.tmdbId}-${item.season || 0}-${item.episode || 0}`"
-              class="group flex-none w-44 sm:w-56 bg-marxi-850 rounded-2xl overflow-hidden border border-marxi-800 hover:border-marxi-accent transition-all duration-300 shadow-md snap-start"
+              class="group relative flex-none w-44 sm:w-56 bg-marxi-850 rounded-2xl overflow-hidden border border-marxi-800 hover:border-marxi-accent transition-all duration-300 shadow-md snap-start"
             >
+              <!-- Remove Item Button -->
+              <button 
+                @click.stop.prevent="removeHistoryItem(item.tmdbId, item.type)"
+                class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/60 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-md opacity-0 group-hover:opacity-100"
+                title="Remove from Continue Watching"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
               <NuxtLink :to="getWatchUrl(item)" class="block relative aspect-video bg-marxi-800 overflow-hidden">
                 <img 
                   :src="getImageUrl(item.backdropPath || item.posterPath, 'w500')" 
@@ -46,6 +57,7 @@
                   </div>
                 </div>
               </NuxtLink>
+
               <div class="p-2.5 sm:p-3 space-y-0.5 sm:space-y-1">
                 <h4 class="font-bold text-xs sm:text-sm text-white truncate group-hover:text-marxi-accent transition-colors">
                   {{ item.title }}
@@ -75,6 +87,14 @@
         viewAllUrl="/movies?sort=popular"
       />
 
+      <!-- Upcoming Movies -->
+      <ContentRow 
+        title="Upcoming Movies" 
+        :items="upcomingMovies" 
+        :loading="loadingMovies"
+        viewAllUrl="/movies?sort=upcoming"
+      />
+
       <!-- Top Rated Movies -->
       <ContentRow 
         title="Top Rated Movies" 
@@ -89,6 +109,14 @@
         :items="popularTv" 
         :loading="loadingTv"
         viewAllUrl="/tv?sort=popular"
+      />
+
+      <!-- Airing Today TV Shows -->
+      <ContentRow 
+        title="Airing Today" 
+        :items="airingTodayTv" 
+        :loading="loadingTv"
+        viewAllUrl="/tv?sort=airing_today"
       />
 
       <!-- Trending TV Shows -->
@@ -112,6 +140,8 @@
 </template>
 
 <script setup lang="ts">
+import { useTmdb } from '~/composables/useTmdb';
+import { useWatchHistory } from '~/composables/useWatchHistory';
 import type { MediaItem, WatchHistoryItem } from '~/types/tmdb';
 
 useSeoMeta({
@@ -122,9 +152,6 @@ useSeoMeta({
 });
 
 useHead({
-  link: [
-    { rel: 'canonical', href: 'https://reflix.rehmanwebs.com/' }
-  ],
   script: [
     {
       type: 'application/ld+json',
@@ -133,6 +160,7 @@ useHead({
         '@type': 'WebSite',
         'name': 'RHFlix',
         'url': 'https://reflix.rehmanwebs.com/',
+        'description': 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in full HD.',
         'potentialAction': {
           '@type': 'SearchAction',
           'target': 'https://reflix.rehmanwebs.com/search?q={search_term_string}',
@@ -143,18 +171,20 @@ useHead({
   ]
 });
 
-const { getTrending, getPopular, getTopRated, getImageUrl } = useTmdb();
-const { history, clearHistory } = useWatchHistory();
+const { getTrending, getPopular, getTopRated, getUpcoming, getAiringToday, getImageUrl } = useTmdb();
+const { history, removeHistoryItem, clearHistory } = useWatchHistory();
 
 const watchHistoryItems = computed(() => history.value);
 
 const featuredItem = ref<MediaItem | null>(null);
 const trendingMovies = ref<MediaItem[]>([]);
 const popularMovies = ref<MediaItem[]>([]);
+const upcomingMovies = ref<MediaItem[]>([]);
 const topRatedMovies = ref<MediaItem[]>([]);
 
 const trendingTv = ref<MediaItem[]>([]);
 const popularTv = ref<MediaItem[]>([]);
+const airingTodayTv = ref<MediaItem[]>([]);
 const topRatedTv = ref<MediaItem[]>([]);
 
 const loadingHero = ref(true);
@@ -169,14 +199,16 @@ const getWatchUrl = (item: WatchHistoryItem) => {
 
 onMounted(async () => {
   try {
-    const [tMovies, pMovies, trMovies] = await Promise.all([
+    const [tMovies, pMovies, uMovies, trMovies] = await Promise.all([
       getTrending('movie'),
       getPopular('movie'),
+      getUpcoming(),
       getTopRated('movie')
     ]);
 
     trendingMovies.value = tMovies.results.map(i => ({ ...i, media_type: 'movie' }));
     popularMovies.value = pMovies.results.map(i => ({ ...i, media_type: 'movie' }));
+    upcomingMovies.value = uMovies.results.map(i => ({ ...i, media_type: 'movie' }));
     topRatedMovies.value = trMovies.results.map(i => ({ ...i, media_type: 'movie' }));
 
     if (trendingMovies.value.length > 0) {
@@ -190,14 +222,16 @@ onMounted(async () => {
   }
 
   try {
-    const [tTv, pTv, trTv] = await Promise.all([
+    const [tTv, pTv, aTv, trTv] = await Promise.all([
       getTrending('tv'),
       getPopular('tv'),
+      getAiringToday(),
       getTopRated('tv')
     ]);
 
     trendingTv.value = tTv.results.map(i => ({ ...i, media_type: 'tv' }));
     popularTv.value = pTv.results.map(i => ({ ...i, media_type: 'tv' }));
+    airingTodayTv.value = aTv.results.map(i => ({ ...i, media_type: 'tv' }));
     topRatedTv.value = trTv.results.map(i => ({ ...i, media_type: 'tv' }));
   } catch (err) {
     console.error('Error fetching home TV shows:', err);

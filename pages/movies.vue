@@ -8,7 +8,7 @@
           Explore Movies
         </h1>
         <p class="text-xs sm:text-sm text-gray-400 mt-1">
-          Browse popular, trending, and top-rated movies streaming on RHFlix.
+          Browse popular, trending, top-rated, and upcoming movies streaming on RHFlix.
         </p>
       </div>
 
@@ -95,23 +95,17 @@
 </template>
 
 <script setup lang="ts">
+import { useTmdb } from '~/composables/useTmdb';
 import type { MediaItem, Genre } from '~/types/tmdb';
 
 useSeoMeta({
-  title: 'Explore Popular Movies - RHFlix',
-  ogTitle: 'Explore Popular Movies - RHFlix',
-  description: 'Browse popular, trending, and top-rated movies streaming on RHFlix.',
-  ogDescription: 'Browse popular, trending, and top-rated movies streaming on RHFlix.'
-});
-
-useHead({
-  link: [
-    { rel: 'canonical', href: 'https://reflix.rehmanwebs.com/movies' }
-  ]
+  title: 'Explore Movies - RHFlix',
+  ogTitle: 'Explore Movies - RHFlix',
+  description: 'Browse popular, trending, top-rated, and upcoming movies streaming on RHFlix.'
 });
 
 const route = useRoute();
-const { getPopular, getTrending, getTopRated, getNowPlaying, getGenres, getByGenre } = useTmdb();
+const { getPopular, getTrending, getTopRated, getNowPlaying, getUpcoming, getGenres, getByGenre } = useTmdb();
 
 const currentSort = ref((route.query.sort as string) || 'popular');
 const selectedGenreId = ref<number | null>(null);
@@ -127,7 +121,8 @@ const sortTabs = [
   { id: 'popular', label: 'Popular' },
   { id: 'trending', label: 'Trending' },
   { id: 'top_rated', label: 'Top Rated' },
-  { id: 'now_playing', label: 'Now Playing' }
+  { id: 'now_playing', label: 'Now Playing' },
+  { id: 'upcoming', label: 'Upcoming' }
 ];
 
 const hasMore = computed(() => page.value < totalPages.value);
@@ -155,6 +150,9 @@ const fetchMovies = async (reset = true) => {
           break;
         case 'now_playing':
           res = await getNowPlaying(page.value);
+          break;
+        case 'upcoming':
+          res = await getUpcoming(page.value);
           break;
         case 'popular':
         default:

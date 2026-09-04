@@ -5,12 +5,12 @@
     <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
       <NuxtLink 
         :to="`/tv/${tvId}`" 
-        class="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-semibold text-gray-300 hover:text-white bg-marxi-850/90 hover:bg-marxi-800 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl border border-marxi-700/80 transition-colors min-h-[40px] sm:min-h-[44px]"
+        class="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-semibold text-gray-300 hover:text-white bg-marxi-850 hover:bg-marxi-800 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl border border-marxi-800 transition-colors min-h-[40px] sm:min-h-[44px]"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        <span>Back to Series</span>
+        <span>Back to Series Details</span>
       </NuxtLink>
 
       <!-- Episode Navigation Controls -->
@@ -18,12 +18,12 @@
         <button
           v-if="hasPrevEpisode"
           @click="selectEpisode(currentSeasonNumber, currentEpisodeNumber - 1)"
-          class="px-3 py-2 sm:px-3.5 sm:py-2.5 bg-marxi-850 hover:bg-marxi-800 text-white font-semibold text-xs rounded-xl border border-marxi-700/80 flex items-center space-x-1 transition-colors min-h-[40px] sm:min-h-[44px]"
+          class="px-3 py-2 sm:px-3.5 sm:py-2.5 bg-marxi-850 hover:bg-marxi-800 text-white font-semibold text-xs rounded-xl border border-marxi-800 flex items-center space-x-1 transition-colors min-h-[40px] sm:min-h-[44px]"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
-          <span>Prev</span>
+          <span>Previous Episode</span>
         </button>
 
         <button
@@ -31,7 +31,7 @@
           @click="selectEpisode(currentSeasonNumber, currentEpisodeNumber + 1)"
           class="px-3 py-2 sm:px-3.5 sm:py-2.5 bg-marxi-accent hover:bg-marxi-accentHover text-white font-bold text-xs rounded-xl shadow-glow-red flex items-center space-x-1 transition-all min-h-[40px] sm:min-h-[44px]"
         >
-          <span>Next Ep</span>
+          <span>Next Episode</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <!-- Playback Player Section (Flush Edge-to-Edge on Mobile) -->
+    <!-- Playback Player Section -->
     <div class="-mx-3 sm:mx-0">
       <PlaybackPlayer 
         mediaType="tv" 
@@ -47,14 +47,17 @@
         :season="currentSeasonNumber"
         :episode="currentEpisodeNumber"
         :title="show?.name"
+        :posterPath="show?.poster_path"
+        :backdropPath="show?.backdrop_path"
+        :episodeName="activeEpisode?.name"
       />
     </div>
 
     <!-- TV Show & Episode Info -->
-    <div class="bg-marxi-850 rounded-2xl p-4 sm:p-6 border border-marxi-800/80 space-y-3.5 sm:space-y-6 shadow-xl">
+    <div class="bg-marxi-850 rounded-2xl p-4 sm:p-6 border border-marxi-800 space-y-3.5 sm:space-y-6 shadow-xl">
       
       <!-- Title & Current Episode Banner -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-marxi-800/80 pb-3.5 sm:pb-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-marxi-800 pb-3.5 sm:pb-4">
         <div>
           <div class="flex items-center space-x-2 text-[11px] sm:text-xs font-bold text-marxi-accent mb-1">
             <span>{{ show?.name || 'TV Series' }}</span>
@@ -92,8 +95,8 @@
         </p>
       </div>
 
-      <!-- Season Episode Cards List (Horizontal Snap Scroll on Mobile) -->
-      <div v-if="seasonDetails && seasonDetails.episodes" class="space-y-2 pt-3 border-t border-marxi-800/80">
+      <!-- Season Episode Cards List -->
+      <div v-if="seasonDetails && seasonDetails.episodes" class="space-y-2 pt-3 border-t border-marxi-800">
         <h4 class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">
           Season {{ currentSeasonNumber }} Episodes
         </h4>
@@ -116,8 +119,8 @@
 
     </div>
 
-    <!-- Top Cast Section (Grid UI) -->
-    <div v-if="topCast.length > 0" class="space-y-3 sm:space-y-4 pt-2 sm:pt-4 border-t border-marxi-800/80">
+    <!-- Top Cast Section -->
+    <div v-if="topCast.length > 0" class="space-y-3 sm:space-y-4 pt-2 sm:pt-4 border-t border-marxi-800">
       <div class="flex items-center space-x-2.5">
         <div class="w-1.5 h-5 sm:h-6 bg-marxi-accent rounded-full"></div>
         <h3 class="font-display text-base sm:text-xl font-bold text-white tracking-tight">
@@ -129,7 +132,7 @@
         <div 
           v-for="actor in topCast" 
           :key="actor.id"
-          class="group relative bg-marxi-850 hover:bg-marxi-800 p-2 sm:p-3 rounded-2xl border border-marxi-800/80 hover:border-marxi-700 transition-all duration-300 flex items-center space-x-2.5"
+          class="group relative bg-marxi-850 hover:bg-marxi-800 p-2 sm:p-3 rounded-2xl border border-marxi-800 hover:border-marxi-700 transition-all duration-300 flex items-center space-x-2.5"
         >
           <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl overflow-hidden bg-marxi-800 shrink-0 border border-marxi-700 shadow-md group-hover:scale-105 transition-transform">
             <img 
@@ -148,170 +151,126 @@
               {{ actor.name }}
             </h4>
             <p class="text-[10px] sm:text-[11px] text-gray-400 truncate mt-0.5 font-medium">
-              {{ actor.character || 'Cast' }}
+              {{ actor.character }}
             </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Similar TV Shows Row (Grid Layout) -->
+    <!-- Similar TV Shows Row -->
     <ContentRow 
       v-if="similarShows.length > 0"
-      title="More TV Series Like This"
-      :items="similarShows"
-      layout="grid"
+      title="More Series Like This" 
+      :items="similarShows" 
+      :loading="loadingSimilar"
     />
 
   </div>
 </template>
 
 <script setup lang="ts">
-import type { TVDetails, SeasonDetails, Episode, CastMember, MediaItem } from '~/types/tmdb';
-
-definePageMeta({
-  key: route => route.fullPath
-});
+import { useTmdb } from '~/composables/useTmdb';
+import type { TVDetails, SeasonDetails, Episode, MediaItem, CastMember } from '~/types/tmdb';
 
 const route = useRoute();
 const router = useRouter();
 
 const tvId = computed(() => route.params.id as string);
-const seasonParam = computed(() => Number(route.params.season) || 1);
-const episodeParam = computed(() => Number(route.params.episode) || 1);
-
-const currentSeasonNumber = ref(seasonParam.value);
-const currentEpisodeNumber = ref(episodeParam.value);
+const currentSeasonNumber = ref(1);
+const currentEpisodeNumber = ref(1);
 
 const { getTVDetails, getSeasonDetails, getCredits, getSimilar, getImageUrl } = useTmdb();
-const { addWatchHistory } = useWatchHistory();
 
 const show = ref<TVDetails | null>(null);
 const seasonDetails = ref<SeasonDetails | null>(null);
 const topCast = ref<CastMember[]>([]);
 const similarShows = ref<MediaItem[]>([]);
+const loadingSimilar = ref(true);
 
 const validSeasons = computed(() => {
-  return show.value?.seasons?.filter(s => s.season_number > 0) || [];
+  if (!show.value || !show.value.seasons) return [];
+  return show.value.seasons.filter(s => s.season_number > 0);
 });
 
-const activeEpisode = computed<Episode | undefined>(() => {
-  return seasonDetails.value?.episodes.find(e => e.episode_number === currentEpisodeNumber.value);
+const activeEpisode = computed<Episode | null>(() => {
+  if (!seasonDetails.value || !seasonDetails.value.episodes) return null;
+  return seasonDetails.value.episodes.find(e => e.episode_number === currentEpisodeNumber.value) || seasonDetails.value.episodes[0] || null;
 });
 
-const totalEpisodes = computed(() => seasonDetails.value?.episodes.length || 0);
+const hasPrevEpisode = computed(() => {
+  return currentEpisodeNumber.value > 1;
+});
 
-const hasPrevEpisode = computed(() => currentEpisodeNumber.value > 1);
-const hasNextEpisode = computed(() => currentEpisodeNumber.value < totalEpisodes.value);
+const hasNextEpisode = computed(() => {
+  if (!seasonDetails.value || !seasonDetails.value.episodes) return false;
+  return currentEpisodeNumber.value < seasonDetails.value.episodes.length;
+});
 
-const getInitials = (name: string) => {
-  if (!name) return '??';
-  const parts = name.trim().split(' ');
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
+const getInitials = (name: string): string => {
+  if (!name) return 'RH';
+  const parts = name.split(' ');
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   return name.substring(0, 2).toUpperCase();
 };
 
-const selectEpisode = (s: number, e: number) => {
-  currentSeasonNumber.value = s;
-  currentEpisodeNumber.value = e;
-  router.push(`/watch/tv/${tvId.value}/${s}/${e}`);
-  fetchSeasonData(s);
-  recordHistory();
-};
-
-const handleSeasonSelect = () => {
-  currentEpisodeNumber.value = 1;
-  router.push(`/watch/tv/${tvId.value}/${currentSeasonNumber.value}/1`);
-  fetchSeasonData(currentSeasonNumber.value);
-  recordHistory();
-};
-
-const fetchSeasonData = async (seasonNum: number) => {
+const loadShowData = async () => {
+  if (!tvId.value) return;
   try {
-    seasonDetails.value = await getSeasonDetails(tvId.value, seasonNum);
-  } catch (err) {
-    console.error(`Error loading season ${seasonNum}:`, err);
-  }
-};
+    show.value = await getTVDetails(tvId.value);
+    
+    // Default to first valid season if seasons exist
+    if (validSeasons.value.length > 0) {
+      currentSeasonNumber.value = validSeasons.value[0].season_number;
+    }
 
-const recordHistory = () => {
-  if (show.value) {
-    const epName = activeEpisode.value?.name || `Episode ${currentEpisodeNumber.value}`;
-    addWatchHistory({
-      tmdbId: show.value.id,
-      type: 'tv',
-      title: show.value.name,
-      posterPath: show.value.poster_path,
-      backdropPath: activeEpisode.value?.still_path || show.value.backdrop_path,
-      season: currentSeasonNumber.value,
-      episode: currentEpisodeNumber.value,
-      episodeName: epName
-    });
-  }
-};
-
-const loadWatchData = async () => {
-  try {
-    const [showData, creditsData, similarData] = await Promise.all([
-      getTVDetails(tvId.value),
-      getCredits('tv', tvId.value).catch(() => ({ cast: [], crew: [] })),
-      getSimilar('tv', tvId.value).catch(() => ({ results: [] }))
+    await loadSeasonData();
+    
+    // Fetch credits & similar
+    const [credRes, simRes] = await Promise.all([
+      getCredits('tv', tvId.value),
+      getSimilar('tv', tvId.value)
     ]);
-
-    show.value = showData;
-    if (show.value) {
-      if (route.params.season) {
-        currentSeasonNumber.value = Number(route.params.season);
-      } else if (validSeasons.value.length > 0) {
-        currentSeasonNumber.value = validSeasons.value[0].season_number;
-      }
-
-      if (route.params.episode) {
-        currentEpisodeNumber.value = Number(route.params.episode);
-      }
-
-      useSeoMeta({
-        title: `Watching ${show.value.name} S${currentSeasonNumber.value} E${currentEpisodeNumber.value} - RHFlix`,
-        ogTitle: `Watching ${show.value.name} S${currentSeasonNumber.value} E${currentEpisodeNumber.value} - RHFlix`,
-        description: show.value.overview,
-        ogDescription: show.value.overview,
-        ogImage: show.value.backdrop_path ? getImageUrl(show.value.backdrop_path, 'w500') : undefined
-      });
-
-      useHead({
-        link: [
-          { rel: 'canonical', href: `https://reflix.rehmanwebs.com/watch/tv/${show.value.id}` }
-        ]
-      });
-
-      await fetchSeasonData(currentSeasonNumber.value);
-      recordHistory();
-    }
-
-    if (creditsData) {
-      topCast.value = (creditsData.cast || []).slice(0, 12);
-    }
-
-    if (similarData && similarData.results) {
-      similarShows.value = similarData.results.map(item => ({
-        ...item,
-        media_type: 'tv'
-      }));
-    }
+    topCast.value = (credRes.cast || []).slice(0, 6);
+    similarShows.value = simRes.results || [];
   } catch (err) {
-    console.error('Error fetching TV show watch data:', err);
+    console.error('Error loading TV details:', err);
+  } finally {
+    loadingSimilar.value = false;
   }
 };
 
-watch(() => [route.params.id, route.params.season, route.params.episode], () => {
-  if (route.params.season) currentSeasonNumber.value = Number(route.params.season);
-  if (route.params.episode) currentEpisodeNumber.value = Number(route.params.episode);
-  loadWatchData();
-});
+const loadSeasonData = async () => {
+  if (!tvId.value) return;
+  try {
+    seasonDetails.value = await getSeasonDetails(tvId.value, currentSeasonNumber.value);
+  } catch (err) {
+    console.error('Error loading Season details:', err);
+  }
+};
+
+const handleSeasonSelect = async () => {
+  currentEpisodeNumber.value = 1;
+  await loadSeasonData();
+};
+
+const selectEpisode = (season: number, episode: number) => {
+  currentSeasonNumber.value = season;
+  currentEpisodeNumber.value = episode;
+};
 
 onMounted(() => {
-  loadWatchData();
+  loadShowData();
+});
+
+watch(() => tvId.value, () => {
+  loadShowData();
+});
+
+useHead({
+  title: computed(() => {
+    if (!show.value) return 'Watch TV Series - RHFlix';
+    return `Watch ${show.value.name} S${currentSeasonNumber.value} E${currentEpisodeNumber.value} - RHFlix`;
+  })
 });
 </script>

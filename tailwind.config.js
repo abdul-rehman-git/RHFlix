@@ -15,6 +15,17 @@ export default {
         display: ['Outfit', 'sans-serif'],
       },
       colors: {
+        rhflix: {
+          950: '#06070a',
+          900: '#090a0f',
+          850: '#0f111a',
+          800: '#141724',
+          700: '#1e2235',
+          600: '#2b314a',
+          accent: '#e50914',
+          accentHover: '#ff1e27',
+          gold: '#f5c518',
+        },
         marxi: {
           950: '#06070a',
           900: '#090a0f',

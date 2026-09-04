@@ -1,11 +1,11 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-4 sm:space-y-6">
     
     <!-- Top Action Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
       <NuxtLink 
         :to="`/tv/${tvId}`" 
-        class="inline-flex items-center space-x-2 text-sm font-semibold text-gray-300 hover:text-white bg-marxi-850 hover:bg-marxi-800 px-4 py-2 rounded-xl border border-marxi-700 transition-colors"
+        class="inline-flex items-center space-x-2 text-xs sm:text-sm font-semibold text-gray-300 hover:text-white bg-marxi-850 hover:bg-marxi-800 px-3.5 py-2.5 rounded-xl border border-marxi-800 transition-colors"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -14,24 +14,24 @@
       </NuxtLink>
 
       <!-- Episode Navigation (Prev / Next) -->
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2">
         <NuxtLink
           v-if="hasPrevEpisode"
           :to="prevEpisodeUrl"
-          class="px-4 py-2 bg-marxi-850 hover:bg-marxi-800 text-white font-semibold text-xs rounded-xl border border-marxi-700 flex items-center space-x-1.5 transition-colors"
+          class="px-3.5 py-2.5 bg-marxi-850 hover:bg-marxi-800 text-white font-semibold text-xs rounded-xl border border-marxi-800 flex items-center space-x-1.5 transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
-          <span>Prev Episode</span>
+          <span>Prev Ep</span>
         </NuxtLink>
 
         <NuxtLink
           v-if="hasNextEpisode"
           :to="nextEpisodeUrl"
-          class="px-4 py-2 bg-marxi-accent hover:bg-marxi-accentHover text-white font-bold text-xs rounded-xl shadow-glow-red flex items-center space-x-1.5 transition-all"
+          class="px-3.5 py-2.5 bg-marxi-accent hover:bg-marxi-accentHover text-white font-bold text-xs rounded-xl shadow-glow-red flex items-center space-x-1.5 transition-all"
         >
-          <span>Next Episode</span>
+          <span>Next Ep</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
@@ -40,28 +40,31 @@
     </div>
 
     <!-- Playback Player Section -->
-    <div class="w-full">
+    <div class="-mx-3 sm:mx-0">
       <PlaybackPlayer 
         mediaType="tv" 
         :tmdbId="tvId" 
         :season="seasonNumber"
         :episode="episodeNumber"
         :title="show?.name"
+        :posterPath="show?.poster_path"
+        :backdropPath="currentEpisode?.still_path || show?.backdrop_path"
+        :episodeName="currentEpisode?.name"
       />
     </div>
 
     <!-- TV Show & Episode Info -->
-    <div class="bg-marxi-850 rounded-2xl p-6 border border-marxi-800 space-y-6">
+    <div class="bg-marxi-850 rounded-2xl p-4 sm:p-6 border border-marxi-800 space-y-4 shadow-xl">
       
       <!-- Title & Current Episode Banner -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-marxi-800 pb-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-marxi-800 pb-4">
         <div>
           <div class="flex items-center space-x-2 text-xs font-bold text-marxi-accent mb-1">
             <span>{{ show?.name || 'TV Series' }}</span>
             <span>•</span>
             <span>Season {{ seasonNumber }}, Episode {{ episodeNumber }}</span>
           </div>
-          <h1 class="text-2xl sm:text-3xl font-display font-black text-white">
+          <h1 class="text-xl sm:text-3xl font-display font-black text-white">
             {{ currentEpisode?.name || `Episode ${episodeNumber}` }}
           </h1>
         </div>
@@ -85,16 +88,16 @@
       </div>
 
       <!-- Episode Overview -->
-      <div class="space-y-2">
-        <h3 class="text-white font-bold text-sm">Episode Overview</h3>
-        <p class="text-gray-300 text-sm leading-relaxed">
+      <div class="space-y-1">
+        <h3 class="text-white font-bold text-xs sm:text-sm">Episode Overview</h3>
+        <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">
           {{ currentEpisode?.overview || show?.overview || 'No episode description available.' }}
         </p>
       </div>
 
       <!-- Season Episode Chips Navigation -->
-      <div v-if="seasonDetails && seasonDetails.episodes" class="space-y-3 pt-4 border-t border-marxi-800">
-        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">
+      <div v-if="seasonDetails && seasonDetails.episodes" class="space-y-2 pt-3 border-t border-marxi-800">
+        <h4 class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">
           Season {{ seasonNumber }} Episodes
         </h4>
         <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
@@ -120,6 +123,8 @@
 </template>
 
 <script setup lang="ts">
+import { useTmdb } from '~/composables/useTmdb';
+import { useWatchHistory } from '~/composables/useWatchHistory';
 import type { TVDetails, SeasonDetails, Episode } from '~/types/tmdb';
 
 definePageMeta({
@@ -133,7 +138,7 @@ const tvId = computed(() => route.params.id as string);
 const seasonNumber = computed(() => Number(route.params.season) || 1);
 const episodeNumber = computed(() => Number(route.params.episode) || 1);
 
-const { getTVDetails, getSeasonDetails } = useTmdb();
+const { getTVDetails, getSeasonDetails, getImageUrl } = useTmdb();
 const { addWatchHistory } = useWatchHistory();
 
 const show = ref<TVDetails | null>(null);
@@ -191,14 +196,7 @@ const loadShowAndSeasonData = async () => {
         title: `Watching ${show.value.name} S${seasonNumber.value} E${episodeNumber.value} (${epName}) - RHFlix`,
         ogTitle: `Watching ${show.value.name} S${seasonNumber.value} E${episodeNumber.value} - RHFlix`,
         description: currentEpisode.value?.overview || show.value.overview,
-        ogDescription: currentEpisode.value?.overview || show.value.overview,
-        ogImage: (currentEpisode.value?.still_path || show.value.backdrop_path) ? getImageUrl(currentEpisode.value?.still_path || show.value.backdrop_path || '', 'w500') : undefined
-      });
-
-      useHead({
-        link: [
-          { rel: 'canonical', href: `https://reflix.rehmanwebs.com/watch/tv/${show.value.id}/${seasonNumber.value}/${episodeNumber.value}` }
-        ]
+        ogDescription: currentEpisode.value?.overview || show.value.overview
       });
 
       addWatchHistory({

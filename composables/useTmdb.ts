@@ -13,7 +13,11 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
 
 // SVG Placeholder Data URI for missing posters / stills
-const SVG_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450" fill="%2313151f"%3E%3Crect width="100%25" height="100%25" fill="%2313151f"/%3E%3Cpath d="M120 180h60v90h-60z" fill="%23232738"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%236b7280"%3ERHFlix Stream%3C/text%3E%3C/svg%3E';
+const SVG_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450" fill="%230e1017"%3E%3Crect width="100%25" height="100%25" fill="%230e1017"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%23e50914" font-weight="bold"%3EMARXI%3C/text%3E%3C/svg%3E';
+
+// In-Memory Request Cache with TTL (5 minutes)
+const apiCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 // Mock Data for offline / fallback mode when API key is missing
 const MOCK_MOVIES: MediaItem[] = [
@@ -55,19 +59,6 @@ const MOCK_MOVIES: MediaItem[] = [
     vote_average: 8.4,
     vote_count: 36000,
     genre_ids: [28, 878, 12]
-  },
-  {
-    id: 1078605,
-    title: 'Fallback Feature Movie',
-    overview: 'An exciting action adventure movie ready to test streaming playback.',
-    poster_path: '/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg',
-    backdrop_path: '/hZkgoQY85WAgW2s5FiBGfiG3Mws.jpg',
-    media_type: 'movie',
-    popularity: 88.0,
-    release_date: '2024-01-01',
-    vote_average: 8.1,
-    vote_count: 1200,
-    genre_ids: [28, 53]
   }
 ];
 
@@ -97,19 +88,6 @@ const MOCK_TV_SHOWS: MediaItem[] = [
     vote_average: 8.7,
     vote_count: 9500,
     genre_ids: [16, 35, 10765]
-  },
-  {
-    id: 1396,
-    name: 'Breaking Bad',
-    overview: 'A chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine with a former student.',
-    poster_path: '/ztkUQFLlC1WCC5U95t9x9fAo199.jpg',
-    backdrop_path: '/tsRy63MuZvKCZC28evTV8pViXyU.jpg',
-    media_type: 'tv',
-    popularity: 210.0,
-    first_air_date: '2008-01-20',
-    vote_average: 8.9,
-    vote_count: 13500,
-    genre_ids: [18, 80]
   }
 ];
 
@@ -130,7 +108,7 @@ export const useTmdb = () => {
 
   const fetchFromTmdb = async <T>(endpoint: string, params: Record<string, any> = {}): Promise<T> => {
     if (!isConfigured.value) {
-      throw new Error('TMDB API Key is missing. Please set NUXT_PUBLIC_TMDB_API_KEY in your .env file.');
+      throw new Error('TMDB API Key is missing. Set NUXT_PUBLIC_TMDB_API_KEY in .env file.');
     }
 
     const query = new URLSearchParams({
@@ -138,10 +116,17 @@ export const useTmdb = () => {
       ...params
     });
 
+    const cacheKey = `${endpoint}?${query.toString()}`;
+    const cached = apiCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data as T;
+    }
+
     const url = `${TMDB_BASE_URL}${endpoint}?${query.toString()}`;
 
     try {
       const data = await $fetch<T>(url);
+      apiCache.set(cacheKey, { data, timestamp: Date.now() });
       return data;
     } catch (err: any) {
       console.error(`[TMDB API Error] ${endpoint}:`, err);
@@ -157,7 +142,7 @@ export const useTmdb = () => {
     }
     try {
       return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>(`/trending/${type}/day`, { page });
-    } catch (err) {
+    } catch (_) {
       const items = type === 'movie' ? MOCK_MOVIES : MOCK_TV_SHOWS;
       return { page: 1, results: items, total_pages: 1, total_results: items.length };
     }
@@ -171,7 +156,7 @@ export const useTmdb = () => {
     }
     try {
       return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>(`/${type}/popular`, { page });
-    } catch (err) {
+    } catch (_) {
       const items = type === 'movie' ? MOCK_MOVIES : MOCK_TV_SHOWS;
       return { page: 1, results: items, total_pages: 1, total_results: items.length };
     }
@@ -185,7 +170,7 @@ export const useTmdb = () => {
     }
     try {
       return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>(`/${type}/top_rated`, { page });
-    } catch (err) {
+    } catch (_) {
       const items = type === 'movie' ? MOCK_MOVIES : MOCK_TV_SHOWS;
       return { page: 1, results: items, total_pages: 1, total_results: items.length };
     }
@@ -198,7 +183,19 @@ export const useTmdb = () => {
     }
     try {
       return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>('/movie/now_playing', { page });
-    } catch (err) {
+    } catch (_) {
+      return { page: 1, results: MOCK_MOVIES, total_pages: 1, total_results: MOCK_MOVIES.length };
+    }
+  };
+
+  // Upcoming Movies
+  const getUpcoming = async (page = 1): Promise<TMDBPaginatedResponse<MediaItem>> => {
+    if (!isConfigured.value) {
+      return { page: 1, results: MOCK_MOVIES, total_pages: 1, total_results: MOCK_MOVIES.length };
+    }
+    try {
+      return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>('/movie/upcoming', { page });
+    } catch (_) {
       return { page: 1, results: MOCK_MOVIES, total_pages: 1, total_results: MOCK_MOVIES.length };
     }
   };
@@ -210,7 +207,19 @@ export const useTmdb = () => {
     }
     try {
       return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>('/tv/airing_today', { page });
-    } catch (err) {
+    } catch (_) {
+      return { page: 1, results: MOCK_TV_SHOWS, total_pages: 1, total_results: MOCK_TV_SHOWS.length };
+    }
+  };
+
+  // On The Air TV
+  const getOnTheAir = async (page = 1): Promise<TMDBPaginatedResponse<MediaItem>> => {
+    if (!isConfigured.value) {
+      return { page: 1, results: MOCK_TV_SHOWS, total_pages: 1, total_results: MOCK_TV_SHOWS.length };
+    }
+    try {
+      return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>('/tv/on_the_air', { page });
+    } catch (_) {
       return { page: 1, results: MOCK_TV_SHOWS, total_pages: 1, total_results: MOCK_TV_SHOWS.length };
     }
   };
@@ -228,7 +237,7 @@ export const useTmdb = () => {
     try {
       const res = await fetchFromTmdb<{ genres: Genre[] }>(`/genre/${type}/list`);
       return res.genres || [];
-    } catch (err) {
+    } catch (_) {
       return [
         { id: 28, name: 'Action' },
         { id: 18, name: 'Drama' },
@@ -249,7 +258,7 @@ export const useTmdb = () => {
         with_genres: genreId.toString(),
         page 
       });
-    } catch (err) {
+    } catch (_) {
       const items = type === 'movie' ? MOCK_MOVIES : MOCK_TV_SHOWS;
       return { page: 1, results: items, total_pages: 1, total_results: items.length };
     }
@@ -349,7 +358,7 @@ export const useTmdb = () => {
 
     try {
       return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>(`/search/${type}`, { query, page });
-    } catch (err) {
+    } catch (_) {
       return { page: 1, results: [], total_pages: 0, total_results: 0 };
     }
   };
@@ -370,7 +379,7 @@ export const useTmdb = () => {
     }
     try {
       return await fetchFromTmdb<CreditsResponse>(`/${type}/${id}/credits`);
-    } catch (err) {
+    } catch (_) {
       return { id: Number(id), cast: [], crew: [] };
     }
   };
@@ -383,7 +392,7 @@ export const useTmdb = () => {
     }
     try {
       return await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>(`/${type}/${id}/similar`);
-    } catch (err) {
+    } catch (_) {
       return { page: 1, results: [], total_pages: 0, total_results: 0 };
     }
   };
@@ -395,7 +404,9 @@ export const useTmdb = () => {
     getPopular,
     getTopRated,
     getNowPlaying,
+    getUpcoming,
     getAiringToday,
+    getOnTheAir,
     getGenres,
     getByGenre,
     getMovieDetails,

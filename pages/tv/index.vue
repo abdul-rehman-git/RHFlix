@@ -95,23 +95,17 @@
 </template>
 
 <script setup lang="ts">
+import { useTmdb } from '~/composables/useTmdb';
 import type { MediaItem, Genre } from '~/types/tmdb';
 
 useSeoMeta({
   title: 'Explore TV Series - RHFlix',
   ogTitle: 'Explore TV Series - RHFlix',
-  description: 'Discover top rated series, trending shows, and season updates on RHFlix.',
-  ogDescription: 'Discover top rated series, trending shows, and season updates on RHFlix.'
-});
-
-useHead({
-  link: [
-    { rel: 'canonical', href: 'https://reflix.rehmanwebs.com/tv' }
-  ]
+  description: 'Discover top rated series, trending shows, and season updates on RHFlix.'
 });
 
 const route = useRoute();
-const { getPopular, getTrending, getTopRated, getAiringToday, getGenres, getByGenre } = useTmdb();
+const { getPopular, getTrending, getTopRated, getAiringToday, getOnTheAir, getGenres, getByGenre } = useTmdb();
 
 const currentSort = ref((route.query.sort as string) || 'popular');
 const selectedGenreId = ref<number | null>(null);
@@ -127,7 +121,8 @@ const sortTabs = [
   { id: 'popular', label: 'Popular' },
   { id: 'trending', label: 'Trending' },
   { id: 'top_rated', label: 'Top Rated' },
-  { id: 'airing_today', label: 'Airing Today' }
+  { id: 'airing_today', label: 'Airing Today' },
+  { id: 'on_the_air', label: 'On The Air' }
 ];
 
 const hasMore = computed(() => page.value < totalPages.value);
@@ -155,6 +150,9 @@ const fetchTvShows = async (reset = true) => {
           break;
         case 'airing_today':
           res = await getAiringToday(page.value);
+          break;
+        case 'on_the_air':
+          res = await getOnTheAir(page.value);
           break;
         case 'popular':
         default:

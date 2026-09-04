@@ -19,14 +19,14 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'RHFlix - Unlimited Movies & TV Shows',
+      title: 'RHFlix - Stream Unlimited Movies & TV Shows',
       htmlAttrs: {
         lang: 'en'
       },
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
-        { name: 'description', content: 'Stream your favorite movies and TV series online on RHFlix. Fast, dynamic, and seamless streaming experience.' },
+        { name: 'description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD. Fast, dynamic, cinematic OTT streaming platform.' },
         { name: 'theme-color', content: '#090a0f' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
@@ -36,7 +36,11 @@ export default defineNuxtConfig({
         { name: 'format-detection', content: 'telephone=no' },
         { property: 'og:site_name', content: 'RHFlix' },
         { property: 'og:type', content: 'website' },
-        { name: 'twitter:card', content: 'summary_large_image' }
+        { property: 'og:title', content: 'RHFlix - Stream Unlimited Movies & TV Shows' },
+        { property: 'og:description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD.' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'RHFlix - Stream Unlimited Movies & TV Shows' },
+        { name: 'twitter:description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD.' }
       ],
       link: [
         { rel: 'manifest', href: '/manifest.webmanifest' },

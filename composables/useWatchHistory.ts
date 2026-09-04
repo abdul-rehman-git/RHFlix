@@ -2,11 +2,25 @@ import type { WatchHistoryItem, MediaType } from '~/types/tmdb';
 
 const STORAGE_KEY = 'marxi_watch_history';
 
+// Throttle helper for disk writes
+let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+const throttledSave = (items: WatchHistoryItem[]) => {
+  if (!import.meta.client) return;
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch (err) {
+      console.error('Error saving Watch History to LocalStorage:', err);
+    }
+  }, 400);
+};
+
 export const useWatchHistory = () => {
   const history = useState<WatchHistoryItem[]>('marxi_watch_history', () => []);
 
   onMounted(() => {
-    if (import.meta.client) {
+    if (import.meta.client && history.value.length === 0) {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
@@ -18,35 +32,22 @@ export const useWatchHistory = () => {
           }
         }
       } catch (err) {
-        console.error('Error reading Watch History from localStorage:', err);
-        try {
-          localStorage.removeItem(STORAGE_KEY);
-        } catch (_) {}
+        console.error('Error reading Watch History from LocalStorage:', err);
       }
     }
   });
 
-  const saveToStorage = (items: WatchHistoryItem[]) => {
-    if (import.meta.client) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-      } catch (err) {
-        console.error('Error saving Watch History to localStorage:', err);
-      }
-    }
-  };
-
-  const addWatchHistory = (entry: Omit<WatchHistoryItem, 'timestamp'>) => {
+  const addWatchHistory = (entry: Omit<WatchHistoryItem, 'lastWatchedAt'>) => {
     if (!entry || !entry.tmdbId) return;
 
     const newItem: WatchHistoryItem = {
       ...entry,
-      timestamp: Date.now()
+      lastWatchedAt: Date.now()
     };
 
-    // Filter out previous occurrences of the same movie or same TV show episode
+    // Filter out existing occurrence of same movie or same TV episode
     const updated = history.value.filter(item => {
-      if (item.type !== entry.type || Number(item.tmdbId) !== Number(entry.tmdbId)) {
+      if (item.type !== entry.type || String(item.tmdbId) !== String(entry.tmdbId)) {
         return true;
       }
       if (entry.type === 'tv') {
@@ -57,16 +58,32 @@ export const useWatchHistory = () => {
 
     updated.unshift(newItem);
 
-    // Keep max 20 history items
-    const truncated = updated.slice(0, 20);
+    // Keep max 24 items in watch history
+    const truncated = updated.slice(0, 24);
     history.value = truncated;
-    saveToStorage(truncated);
+    throttledSave(truncated);
+  };
+
+  const updateProgress = (tmdbId: number | string, type: MediaType, progress: number, duration?: number) => {
+    const id = String(tmdbId);
+    const index = history.value.findIndex(i => String(i.tmdbId) === id && i.type === type);
+    if (index > -1) {
+      const items = [...history.value];
+      items[index] = {
+        ...items[index],
+        progress,
+        duration: duration || items[index].duration,
+        lastWatchedAt: Date.now()
+      };
+      history.value = items;
+      throttledSave(items);
+    }
   };
 
   const removeHistoryItem = (tmdbId: number | string, type: MediaType) => {
-    const targetId = Number(tmdbId);
-    history.value = history.value.filter(i => !(Number(i.tmdbId) === targetId && i.type === type));
-    saveToStorage(history.value);
+    const id = String(tmdbId);
+    history.value = history.value.filter(i => !(String(i.tmdbId) === id && i.type === type));
+    throttledSave(history.value);
   };
 
   const clearHistory = () => {
@@ -81,6 +98,7 @@ export const useWatchHistory = () => {
   return {
     history: readonly(history),
     addWatchHistory,
+    updateProgress,
     removeHistoryItem,
     clearHistory
   };

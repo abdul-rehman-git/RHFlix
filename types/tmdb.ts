@@ -108,15 +108,4 @@ export interface CreditsResponse {
   crew: CrewMember[];
 }
 
-export interface WatchHistoryItem {
-  tmdbId: number;
-  type: MediaType;
-  title: string;
-  posterPath: string | null;
-  backdropPath?: string | null;
-  season?: number;
-  episode?: number;
-  episodeName?: string;
-  provider?: string;
-  timestamp: number;
-}
+export type { WatchHistoryItem, MyListItem } from './user';
