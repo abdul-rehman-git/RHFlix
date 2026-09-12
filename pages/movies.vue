@@ -101,7 +101,16 @@ import type { MediaItem, Genre } from '~/types/tmdb';
 useSeoMeta({
   title: 'Explore Movies - RHFlix',
   ogTitle: 'Explore Movies - RHFlix',
-  description: 'Browse popular, trending, top-rated, and upcoming movies streaming on RHFlix.'
+  description: 'Browse popular, trending, top-rated, and upcoming movies streaming on RHFlix.',
+  ogDescription: 'Browse popular, trending, top-rated, and upcoming movies streaming on RHFlix.',
+  ogUrl: 'https://rhflix.rehmanwebs.com/movies',
+  twitterCard: 'summary_large_image'
+});
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://rhflix.rehmanwebs.com/movies' }
+  ]
 });
 
 const route = useRoute();

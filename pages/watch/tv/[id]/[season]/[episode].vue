@@ -196,7 +196,14 @@ const loadShowAndSeasonData = async () => {
         title: `Watching ${show.value.name} S${seasonNumber.value} E${episodeNumber.value} (${epName}) - RHFlix`,
         ogTitle: `Watching ${show.value.name} S${seasonNumber.value} E${episodeNumber.value} - RHFlix`,
         description: currentEpisode.value?.overview || show.value.overview,
-        ogDescription: currentEpisode.value?.overview || show.value.overview
+        ogDescription: currentEpisode.value?.overview || show.value.overview,
+        ogUrl: `https://rhflix.rehmanwebs.com/watch/tv/${show.value.id}/${seasonNumber.value}/${episodeNumber.value}`
+      });
+
+      useHead({
+        link: [
+          { rel: 'canonical', href: `https://rhflix.rehmanwebs.com/watch/tv/${show.value.id}/${seasonNumber.value}/${episodeNumber.value}` }
+        ]
       });
 
       addWatchHistory({

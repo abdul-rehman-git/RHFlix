@@ -101,7 +101,16 @@ import type { MediaItem, Genre } from '~/types/tmdb';
 useSeoMeta({
   title: 'Explore TV Series - RHFlix',
   ogTitle: 'Explore TV Series - RHFlix',
-  description: 'Discover top rated series, trending shows, and season updates on RHFlix.'
+  description: 'Discover top rated series, trending shows, and season updates on RHFlix.',
+  ogDescription: 'Discover top rated series, trending shows, and season updates on RHFlix.',
+  ogUrl: 'https://rhflix.rehmanwebs.com/tv',
+  twitterCard: 'summary_large_image'
+});
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://rhflix.rehmanwebs.com/tv' }
+  ]
 });
 
 const route = useRoute();

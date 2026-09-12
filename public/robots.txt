@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://reflix.rehmanwebs.com/sitemap.xml
+Sitemap: https://rhflix.rehmanwebs.com/sitemap.xml
+Sitemap: https://rhflix.rehmanwebs.com/sitemaps.xml
+Sitemap: https://rhflix.rehmanwebs.com/sitemap_index.xml

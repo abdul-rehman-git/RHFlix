@@ -139,6 +139,24 @@ watch(() => movieId.value, () => {
   loadData();
 });
 
+watch(movie, (newMovie) => {
+  if (newMovie) {
+    useSeoMeta({
+      title: `Watch ${newMovie.title} Online - RHFlix`,
+      ogTitle: `Watch ${newMovie.title} Online - RHFlix`,
+      description: newMovie.overview,
+      ogDescription: newMovie.overview,
+      ogUrl: `https://rhflix.rehmanwebs.com/watch/movie/${newMovie.id}`
+    });
+
+    useHead({
+      link: [
+        { rel: 'canonical', href: `https://rhflix.rehmanwebs.com/watch/movie/${newMovie.id}` }
+      ]
+    });
+  }
+}, { immediate: true });
+
 useHead({
   title: computed(() => movie.value ? `Watch ${movie.value.title} - RHFlix` : 'Watch Movie - RHFlix')
 });

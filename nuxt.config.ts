@@ -34,8 +34,10 @@ export default defineNuxtConfig({
         { name: 'apple-mobile-web-app-title', content: 'RHFlix' },
         { name: 'application-name', content: 'RHFlix' },
         { name: 'format-detection', content: 'telephone=no' },
+        { name: 'robots', content: 'index, follow' },
         { property: 'og:site_name', content: 'RHFlix' },
         { property: 'og:type', content: 'website' },
+        { property: 'og:url', content: 'https://rhflix.rehmanwebs.com/' },
         { property: 'og:title', content: 'RHFlix - Stream Unlimited Movies & TV Shows' },
         { property: 'og:description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD.' },
         { name: 'twitter:card', content: 'summary_large_image' },
@@ -43,6 +45,7 @@ export default defineNuxtConfig({
         { name: 'twitter:description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD.' }
       ],
       link: [
+        { rel: 'canonical', href: 'https://rhflix.rehmanwebs.com/' },
         { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },

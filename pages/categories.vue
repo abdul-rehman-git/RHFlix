@@ -230,7 +230,16 @@ import type { MediaItem, Genre, MediaType } from '~/types/tmdb';
 useSeoMeta({
   title: 'Categories & Regional Explore - RHFlix',
   ogTitle: 'Categories & Regional Explore - RHFlix',
-  description: 'Browse K-Dramas, Anime, Action, Romance, Bollywood, Turkish, 18+ and top genres on RHFlix.'
+  description: 'Browse K-Dramas, Anime, Action, Romance, Bollywood, Turkish, 18+ and top genres on RHFlix.',
+  ogDescription: 'Browse K-Dramas, Anime, Action, Romance, Bollywood, Turkish, 18+ and top genres on RHFlix.',
+  ogUrl: 'https://rhflix.rehmanwebs.com/categories',
+  twitterCard: 'summary_large_image'
+});
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://rhflix.rehmanwebs.com/categories' }
+  ]
 });
 
 const route = useRoute();

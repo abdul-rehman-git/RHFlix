@@ -148,10 +148,16 @@ useSeoMeta({
   title: 'RHFlix - Stream Unlimited Movies & TV Shows',
   ogTitle: 'RHFlix - Stream Unlimited Movies & TV Shows',
   description: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in full HD.',
-  ogDescription: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in full HD.'
+  ogDescription: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in full HD.',
+  ogUrl: 'https://rhflix.rehmanwebs.com/',
+  ogType: 'website',
+  twitterCard: 'summary_large_image'
 });
 
 useHead({
+  link: [
+    { rel: 'canonical', href: 'https://rhflix.rehmanwebs.com/' }
+  ],
   script: [
     {
       type: 'application/ld+json',
@@ -159,11 +165,11 @@ useHead({
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         'name': 'RHFlix',
-        'url': 'https://reflix.rehmanwebs.com/',
+        'url': 'https://rhflix.rehmanwebs.com/',
         'description': 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in full HD.',
         'potentialAction': {
           '@type': 'SearchAction',
-          'target': 'https://reflix.rehmanwebs.com/search?q={search_term_string}',
+          'target': 'https://rhflix.rehmanwebs.com/search?q={search_term_string}',
           'query-input': 'required name=search_term_string'
         }
       })

@@ -298,12 +298,14 @@ const loadData = async () => {
         ogTitle: `${show.value.name} - Stream TV Series on RHFlix`,
         description: show.value.overview,
         ogDescription: show.value.overview,
-        ogImage: show.value.backdrop_path ? getImageUrl(show.value.backdrop_path, 'w500') : undefined
+        ogImage: show.value.backdrop_path ? getImageUrl(show.value.backdrop_path, 'w500') : undefined,
+        ogUrl: `https://rhflix.rehmanwebs.com/tv/${show.value.id}`,
+        twitterCard: 'summary_large_image'
       });
 
       useHead({
         link: [
-          { rel: 'canonical', href: `https://reflix.rehmanwebs.com/tv/${show.value.id}` }
+          { rel: 'canonical', href: `https://rhflix.rehmanwebs.com/tv/${show.value.id}` }
         ],
         script: [
           {
@@ -312,6 +314,7 @@ const loadData = async () => {
               '@context': 'https://schema.org',
               '@type': 'TVSeries',
               'name': show.value.name,
+              'url': `https://rhflix.rehmanwebs.com/tv/${show.value.id}`,
               'image': show.value.poster_path ? getImageUrl(show.value.poster_path, 'w500') : undefined,
               'description': show.value.overview,
               'numberOfSeasons': show.value.number_of_seasons,

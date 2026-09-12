@@ -1,5 +1,5 @@
 import process from 'node:process';globalThis._importMeta_=globalThis._importMeta_||{url:"file:///_entry.js",env:process.env};import { defineComponent, ref, inject, h, hasInjectionContext, getCurrentInstance, readonly, toRef, isRef, computed, shallowRef, resolveComponent, getCurrentScope, unref, isVNode, createCommentVNode, useSSRContext, Suspense, Fragment, createApp, watch, mergeProps, withCtx, createVNode, createTextVNode, openBlock, createBlock, toDisplayString, provide, shallowReactive, onErrorCaptured, onServerPrefetch, resolveDynamicComponent, reactive, effectScope, defineAsyncComponent, isReadonly, isShallow, isReactive, toRaw } from 'vue';
-import { p as parseQuery, i as getContext, k as hasProtocol, l as joinURL, m as parseURL, e as encodePath, n as decodePath, o as isScriptProtocol, w as withQuery, q as withTrailingSlash, r as withoutTrailingSlash, s as sanitizeStatusCode, $ as $fetch$1, t as createHooks, c as createError$1, v as executeAsync, x as defu } from '../nitro/nitro.mjs';
+import { p as parseQuery, k as getContext, l as hasProtocol, m as joinURL, n as parseURL, e as encodePath, o as decodePath, q as isScriptProtocol, w as withQuery, r as withTrailingSlash, t as withoutTrailingSlash, v as sanitizeStatusCode, $ as $fetch$1, x as createHooks, c as createError$1, y as executeAsync, z as defu } from '../nitro/nitro.mjs';
 import { b as baseURL } from '../routes/renderer.mjs';
 import { RouterView, createMemoryHistory, createRouter, START_LOCATION } from 'vue-router';
 import { ssrRenderAttrs, ssrRenderComponent, ssrInterpolate, ssrRenderAttr, ssrRenderList, ssrRenderClass, ssrRenderSuspense, ssrRenderVNode } from 'vue/server-renderer';
@@ -590,45 +590,45 @@ const _routes = [
         name: "tv-id",
         path: ":id()",
         meta: __nuxt_page_meta$3 || {},
-        component: () => import('./_id_-CP3lsQns.mjs')
+        component: () => import('./_id_-DsgZUZTs.mjs')
       },
       {
         name: "tv",
         path: "",
-        component: () => import('./index-NMqQGjPu.mjs')
+        component: () => import('./index-BlWJQDLe.mjs')
       }
     ]
   },
   {
     name: "index",
     path: "/",
-    component: () => import('./index-DfniKajb.mjs')
+    component: () => import('./index-DJHQIj2p.mjs')
   },
   {
     name: "movies",
     path: "/movies",
-    component: () => import('./movies-CrIflyuA.mjs')
+    component: () => import('./movies-BsqY1oT2.mjs')
   },
   {
     name: "search",
     path: "/search",
-    component: () => import('./search-st-NfZPy.mjs')
+    component: () => import('./search-DrH78krw.mjs')
   },
   {
     name: "my-list",
     path: "/my-list",
-    component: () => import('./my-list-DOYClsHx.mjs')
+    component: () => import('./my-list-DTgVYVX9.mjs')
   },
   {
     name: "categories",
     path: "/categories",
-    component: () => import('./categories-CfBu-P42.mjs')
+    component: () => import('./categories-CsA6zKft.mjs')
   },
   {
     name: "movie-id",
     path: "/movie/:id()",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./_id_-RTNMzFuQ.mjs')
+    component: () => import('./_id_-BJimwjkW.mjs')
   },
   {
     name: "watch-tv-id",
@@ -639,14 +639,14 @@ const _routes = [
         name: "watch-tv-id-season-episode",
         path: ":season()/:episode()",
         meta: __nuxt_page_meta || {},
-        component: () => import('./_episode_-CK07UalL.mjs')
+        component: () => import('./_episode_-BcCOmT66.mjs')
       }
     ]
   },
   {
     name: "watch-movie-id",
     path: "/watch/movie/:id()",
-    component: () => import('./_id_-C-1acdOa.mjs')
+    component: () => import('./_id_-BoOlwYh3.mjs')
   }
 ];
 const validate = /* @__PURE__ */ defineNuxtRouteMiddleware(async (to) => {

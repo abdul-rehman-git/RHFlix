@@ -273,12 +273,14 @@ const loadData = async () => {
         ogTitle: `${movie.value.title} - Stream on RHFlix`,
         description: movie.value.overview,
         ogDescription: movie.value.overview,
-        ogImage: movie.value.backdrop_path ? getImageUrl(movie.value.backdrop_path, 'w500') : undefined
+        ogImage: movie.value.backdrop_path ? getImageUrl(movie.value.backdrop_path, 'w500') : undefined,
+        ogUrl: `https://rhflix.rehmanwebs.com/movie/${movie.value.id}`,
+        twitterCard: 'summary_large_image'
       });
 
       useHead({
         link: [
-          { rel: 'canonical', href: `https://reflix.rehmanwebs.com/movie/${movie.value.id}` }
+          { rel: 'canonical', href: `https://rhflix.rehmanwebs.com/movie/${movie.value.id}` }
         ],
         script: [
           {
@@ -287,6 +289,7 @@ const loadData = async () => {
               '@context': 'https://schema.org',
               '@type': 'Movie',
               'name': movie.value.title,
+              'url': `https://rhflix.rehmanwebs.com/movie/${movie.value.id}`,
               'image': movie.value.poster_path ? getImageUrl(movie.value.poster_path, 'w500') : undefined,
               'description': movie.value.overview,
               'datePublished': movie.value.release_date,

@@ -66,7 +66,16 @@ import type { MediaItem } from '~/types/tmdb';
 useSeoMeta({
   title: 'My Watchlist - RHFlix',
   ogTitle: 'My Watchlist - RHFlix',
-  description: 'View your saved movies and TV shows on RHFlix.'
+  description: 'View your saved movies and TV shows on RHFlix.',
+  ogDescription: 'View your saved movies and TV shows on RHFlix.',
+  ogUrl: 'https://rhflix.rehmanwebs.com/my-list',
+  twitterCard: 'summary_large_image'
+});
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://rhflix.rehmanwebs.com/my-list' }
+  ]
 });
 
 const { myList } = useMyList();

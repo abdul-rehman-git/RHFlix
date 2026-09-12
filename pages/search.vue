@@ -107,7 +107,16 @@ import type { MediaItem } from '~/types/tmdb';
 useSeoMeta({
   title: 'Search Movies & TV Shows - RHFlix',
   ogTitle: 'Search Movies & TV Shows - RHFlix',
-  description: 'Search across millions of movies and TV series on RHFlix.'
+  description: 'Search across millions of movies and TV series on RHFlix.',
+  ogDescription: 'Search across millions of movies and TV series on RHFlix.',
+  ogUrl: 'https://rhflix.rehmanwebs.com/search',
+  twitterCard: 'summary_large_image'
+});
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://rhflix.rehmanwebs.com/search' }
+  ]
 });
 
 const route = useRoute();
