@@ -66,15 +66,16 @@
               </p>
             </div>
 
-            <!-- Genres Pills -->
+            <!-- Genres Pills (Clickable Category Links) -->
             <div v-if="show.genres && show.genres.length > 0" class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2">
-              <span 
+              <NuxtLink 
                 v-for="genre in show.genres" 
                 :key="genre.id"
-                class="px-2.5 py-1 bg-marxi-850 text-xs font-semibold text-gray-300 rounded-full border border-marxi-700"
+                :to="`/categories?type=tv&genre=${genre.id}`"
+                class="px-2.5 py-1 bg-marxi-850 hover:bg-marxi-800 text-xs font-semibold text-gray-300 hover:text-white rounded-full border border-marxi-700 hover:border-marxi-gold/50 transition-colors"
               >
                 {{ genre.name }}
-              </span>
+              </NuxtLink>
             </div>
 
             <!-- Action Buttons (Min 44px Touch Target) -->
@@ -88,6 +89,17 @@
                 </svg>
                 <span>Start Watching (S1 E1)</span>
               </NuxtLink>
+
+              <button 
+                v-if="trailerKey"
+                @click="isTrailerOpen = true"
+                class="px-5 py-3 sm:px-6 sm:py-3.5 bg-marxi-800 hover:bg-marxi-700 text-marxi-gold font-bold rounded-xl flex items-center space-x-2 border border-marxi-gold/30 hover:border-marxi-gold transition-all min-h-[44px] shadow-md"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 3h6a1 1 0 010 2H7a1 1 0 010-2zm0 4h6a1 1 0 010 2H7a1 1 0 010-2zm0 4h4a1 1 0 010 2H7a1 1 0 010-2z" clip-rule="evenodd" />
+                </svg>
+                <span>Watch Trailer</span>
+              </button>
 
               <button 
                 @click="toggleMyList(show)"
@@ -195,6 +207,14 @@
 
       </div>
     </div>
+
+    <!-- Official Trailer Modal -->
+    <TrailerModal 
+      :isOpen="isTrailerOpen" 
+      :videoKey="trailerKey" 
+      :title="show?.name" 
+      @close="isTrailerOpen = false" 
+    />
   </div>
 </template>
 
@@ -208,12 +228,14 @@ definePageMeta({
 const route = useRoute();
 const tvId = computed(() => route.params.id as string);
 
-const { getTVDetails, getSeasonDetails, getCredits, getSimilar, getImageUrl } = useTmdb();
+const { getTVDetails, getSeasonDetails, getCredits, getSimilar, getVideos, getImageUrl } = useTmdb();
 const { isInList, toggleMyList } = useMyList();
 
 const show = ref<TVDetails | null>(null);
 const topCast = ref<CastMember[]>([]);
 const similarShows = ref<MediaItem[]>([]);
+const trailerKey = ref<string | null>(null);
+const isTrailerOpen = ref(false);
 
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -252,14 +274,24 @@ watch(selectedSeasonNumber, (newNum) => {
 const loadData = async () => {
   loading.value = true;
   error.value = null;
+  trailerKey.value = null;
   try {
-    const [showData, creditsData, similarData] = await Promise.all([
+    const [showData, creditsData, similarData, videosData] = await Promise.all([
       getTVDetails(tvId.value),
       getCredits('tv', tvId.value).catch(() => ({ cast: [], crew: [] })),
-      getSimilar('tv', tvId.value).catch(() => ({ results: [] }))
+      getSimilar('tv', tvId.value).catch(() => ({ results: [] })),
+      getVideos('tv', tvId.value).catch(() => [])
     ]);
 
     show.value = showData;
+
+    // Find official trailer or first YouTube video
+    if (videosData && videosData.length > 0) {
+      const trailer = videosData.find(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.official)) || videosData[0];
+      if (trailer && trailer.key) {
+        trailerKey.value = trailer.key;
+      }
+    }
     if (show.value) {
       useSeoMeta({
         title: `${show.value.name} - Stream TV Series on RHFlix`,

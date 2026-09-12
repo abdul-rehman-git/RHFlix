@@ -46,6 +46,14 @@
               TV Shows
             </NuxtLink>
             <NuxtLink 
+              to="/categories" 
+              class="text-sm font-medium transition-colors hover:text-white flex items-center space-x-1"
+              :class="[route.path.startsWith('/categories') ? 'text-white font-semibold' : 'text-gray-400']"
+            >
+              <span>Categories</span>
+              <span class="px-1.5 py-0.2 text-[9px] bg-marxi-gold text-black font-extrabold rounded uppercase">Hub</span>
+            </NuxtLink>
+            <NuxtLink 
               to="/my-list" 
               class="text-sm font-medium transition-colors hover:text-white flex items-center space-x-1.5"
               :class="[route.path === '/my-list' ? 'text-white font-semibold' : 'text-gray-400']"
@@ -242,6 +250,21 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             <span>TV Shows</span>
+          </NuxtLink>
+
+          <NuxtLink 
+            to="/categories" 
+            @click="mobileMenuOpen = false"
+            class="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all"
+            :class="[route.path.startsWith('/categories') ? 'bg-marxi-accent text-white font-bold shadow-glow-red' : 'text-gray-300 hover:bg-marxi-850 hover:text-white']"
+          >
+            <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-marxi-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              <span>Categories & Regions</span>
+            </div>
+            <span class="px-2 py-0.5 text-[9px] bg-marxi-gold text-black font-extrabold rounded uppercase">Hub</span>
           </NuxtLink>
 
           <NuxtLink 

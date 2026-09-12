@@ -2,38 +2,71 @@ import type { WatchHistoryItem, MediaType } from '~/types/tmdb';
 
 const STORAGE_KEY = 'marxi_watch_history';
 
-// Throttle helper for disk writes
+// Safe localStorage saver with QuotaExceeded error handling
+const saveToLocalStorage = (items: WatchHistoryItem[]) => {
+  if (!import.meta.client) return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch (err: any) {
+    if (err.name === 'QuotaExceededError' || err.code === 22) {
+      console.warn('[Storage Error] LocalStorage quota exceeded. Pruning old watch history...');
+      // Prune oldest items to free up space
+      const pruned = items.slice(0, 10);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(pruned));
+      } catch (_) {}
+    } else {
+      console.error('Error saving Watch History to LocalStorage:', err);
+    }
+  }
+};
+
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 const throttledSave = (items: WatchHistoryItem[]) => {
   if (!import.meta.client) return;
   if (saveTimeout) clearTimeout(saveTimeout);
   saveTimeout = setTimeout(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch (err) {
-      console.error('Error saving Watch History to LocalStorage:', err);
-    }
+    saveToLocalStorage(items);
   }, 400);
 };
 
 export const useWatchHistory = () => {
   const history = useState<WatchHistoryItem[]>('marxi_watch_history', () => []);
 
-  onMounted(() => {
-    if (import.meta.client && history.value.length === 0) {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            history.value = parsed.filter(item => item && typeof item === 'object' && Boolean(item.tmdbId));
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
-          }
+  const loadFromStorage = () => {
+    if (!import.meta.client) return;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          history.value = parsed.filter(item => item && typeof item === 'object' && Boolean(item.tmdbId));
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
         }
-      } catch (err) {
-        console.error('Error reading Watch History from LocalStorage:', err);
       }
+    } catch (err) {
+      console.error('Error reading Watch History from LocalStorage:', err);
+    }
+  };
+
+  onMounted(() => {
+    if (import.meta.client) {
+      if (history.value.length === 0) {
+        loadFromStorage();
+      }
+
+      // Task C: Multi-Tab Storage Synchronization
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === STORAGE_KEY) {
+          loadFromStorage();
+        }
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+      onUnmounted(() => {
+        window.removeEventListener('storage', handleStorageChange);
+      });
     }
   });
 
@@ -64,20 +97,50 @@ export const useWatchHistory = () => {
     throttledSave(truncated);
   };
 
-  const updateProgress = (tmdbId: number | string, type: MediaType, progress: number, duration?: number) => {
+  const updateProgress = (
+    tmdbId: number | string, 
+    type: MediaType, 
+    progress: number, 
+    duration?: number,
+    season?: number,
+    episode?: number
+  ) => {
     const id = String(tmdbId);
-    const index = history.value.findIndex(i => String(i.tmdbId) === id && i.type === type);
+    const index = history.value.findIndex(i => {
+      if (String(i.tmdbId) !== id || i.type !== type) return false;
+      if (type === 'tv') {
+        return Number(i.season) === Number(season || 1) && Number(i.episode) === Number(episode || 1);
+      }
+      return true;
+    });
+
     if (index > -1) {
       const items = [...history.value];
       items[index] = {
         ...items[index],
-        progress,
-        duration: duration || items[index].duration,
+        progress: Math.floor(progress),
+        duration: duration ? Math.floor(duration) : items[index].duration,
         lastWatchedAt: Date.now()
       };
       history.value = items;
       throttledSave(items);
     }
+  };
+
+  const getItemProgress = (
+    tmdbId: number | string, 
+    type: MediaType, 
+    season?: number, 
+    episode?: number
+  ): WatchHistoryItem | undefined => {
+    const id = String(tmdbId);
+    return history.value.find(i => {
+      if (String(i.tmdbId) !== id || i.type !== type) return false;
+      if (type === 'tv' && season !== undefined && episode !== undefined) {
+        return Number(i.season) === Number(season) && Number(i.episode) === Number(episode);
+      }
+      return true;
+    });
   };
 
   const removeHistoryItem = (tmdbId: number | string, type: MediaType) => {
@@ -99,6 +162,7 @@ export const useWatchHistory = () => {
     history: readonly(history),
     addWatchHistory,
     updateProgress,
+    getItemProgress,
     removeHistoryItem,
     clearHistory
   };

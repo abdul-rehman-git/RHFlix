@@ -17,10 +17,15 @@
 
       <!-- Top Badges -->
       <div class="absolute top-2 left-2 right-2 flex items-center justify-between z-10">
-        <!-- Media Type Tag -->
-        <span class="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded bg-marxi-950/80 backdrop-blur-md text-gray-200 border border-white/10">
-          {{ isMovie ? 'Movie' : 'TV' }}
-        </span>
+        <!-- Media Type & Adult Badges -->
+        <div class="flex items-center space-x-1">
+          <span class="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded bg-marxi-950/80 backdrop-blur-md text-gray-200 border border-white/10">
+            {{ isMovie ? 'Movie' : 'TV' }}
+          </span>
+          <span v-if="item.adult" class="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-extrabold tracking-wider uppercase rounded bg-red-600/90 text-white border border-red-400/40 shadow-glow-red">
+            18+
+          </span>
+        </div>
 
         <!-- Rating Badge -->
         <div v-if="item.vote_average" class="flex items-center space-x-0.5 px-1.5 py-0.5 text-[10px] sm:text-[11px] font-bold rounded bg-black/75 backdrop-blur-md text-marxi-gold border border-white/10">

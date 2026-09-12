@@ -130,6 +130,43 @@
         class="absolute top-0 left-0 right-0 h-1 bg-marxi-accent animate-pulse z-30"
       ></div>
 
+      <!-- Resume Watch Position Toast Overlay -->
+      <transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 translate-y-2"
+      >
+        <div 
+          v-if="showResumePrompt && savedProgressSeconds > 10" 
+          class="absolute top-3 left-3 right-3 sm:left-6 sm:right-auto z-40 max-w-md bg-marxi-950/95 border border-marxi-gold/40 rounded-xl p-3 shadow-2xl flex items-center justify-between gap-3 text-xs text-white backdrop-blur-md"
+        >
+          <div class="flex items-center space-x-2 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-marxi-gold animate-ping shrink-0"></span>
+            <div class="truncate">
+              <span class="text-marxi-gold font-bold block">Resume Playback?</span>
+              <span class="text-[11px] text-gray-300">Last watched at {{ formattedResumeTime }}</span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 shrink-0">
+            <button 
+              @click="applyResumeTime" 
+              class="px-3 py-1.5 bg-marxi-gold hover:bg-amber-400 text-black font-bold rounded-lg text-xs transition-colors shadow-md min-h-[32px]"
+            >
+              Resume
+            </button>
+            <button 
+              @click="showResumePrompt = false" 
+              class="px-2 py-1.5 text-gray-400 hover:text-white text-xs"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      </transition>
+
       <!-- Loading / Fallback Skeleton Overlay -->
       <div 
         v-if="currentState === 'LOADING' || currentState === 'FALLBACK'" 
@@ -220,7 +257,7 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const { addWatchHistory } = useWatchHistory();
+const { addWatchHistory, updateProgress, getItemProgress } = useWatchHistory();
 
 const mode = ref<PlaybackMode>('auto');
 const selectedProviderId = ref<PlaybackProviderId>('vidcore');
@@ -232,6 +269,10 @@ const currentState = ref<PlaybackState>('LOADING');
 
 const iframeRef = ref<HTMLIFrameElement | null>(null);
 let fallbackGraceTimer: ReturnType<typeof setTimeout> | null = null;
+
+const showResumePrompt = ref(false);
+const savedProgressSeconds = ref(0);
+const resumeTimeOffset = ref<number | null>(null);
 
 const activeProvider = computed(() => getProviderById(selectedProviderId.value));
 
@@ -246,15 +287,16 @@ const requestedLang = computed(() => {
 
 /**
  * Dynamically computes the VidCore or fallback provider embed URL.
- * Preserves mediaType, tmdbId, season, episode, and passes defaultLang if specified.
+ * Preserves mediaType, tmdbId, season, episode, passes defaultLang, and optional resume offset.
  */
 const currentEmbedUrl = computed(() => {
   if (!props.tmdbId) return '';
   const lang = requestedLang.value;
+  let rawUrl = '';
   if (props.mediaType === 'movie') {
-    return buildMoviePlaybackUrl(selectedProviderId.value, props.tmdbId, lang, isUsingMirror.value);
+    rawUrl = buildMoviePlaybackUrl(selectedProviderId.value, props.tmdbId, lang, isUsingMirror.value);
   } else {
-    return buildEpisodePlaybackUrl(
+    rawUrl = buildEpisodePlaybackUrl(
       selectedProviderId.value, 
       props.tmdbId, 
       props.season || 1, 
@@ -263,10 +305,54 @@ const currentEmbedUrl = computed(() => {
       isUsingMirror.value
     );
   }
+
+  if (resumeTimeOffset.value && resumeTimeOffset.value > 0) {
+    try {
+      const urlObj = new URL(rawUrl);
+      urlObj.searchParams.set('t', String(resumeTimeOffset.value));
+      return urlObj.toString();
+    } catch (_) {
+      return `${rawUrl}#t=${resumeTimeOffset.value}`;
+    }
+  }
+
+  return rawUrl;
 });
 
 const isProviderFailed = (id: PlaybackProviderId) => {
   return failedProviders.value.has(id);
+};
+
+const formattedResumeTime = computed(() => {
+  const total = savedProgressSeconds.value;
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+});
+
+const checkSavedProgress = () => {
+  if (!props.tmdbId) return;
+  const saved = getItemProgress(props.tmdbId, props.mediaType, props.season, props.episode);
+  if (saved && saved.progress && saved.progress > 10) {
+    savedProgressSeconds.value = saved.progress;
+    showResumePrompt.value = true;
+  } else {
+    showResumePrompt.value = false;
+    savedProgressSeconds.value = 0;
+  }
+};
+
+const applyResumeTime = () => {
+  if (savedProgressSeconds.value > 0) {
+    resumeTimeOffset.value = savedProgressSeconds.value;
+    showResumePrompt.value = false;
+    // Send postMessage seek if iframe supports it
+    if (iframeRef.value && iframeRef.value.contentWindow) {
+      try {
+        iframeRef.value.contentWindow.postMessage({ type: 'SEEK', time: savedProgressSeconds.value }, '*');
+      } catch (_) {}
+    }
+  }
 };
 
 const setAudioLanguage = (langCode: string | undefined) => {
@@ -372,12 +458,41 @@ const handleIframeLoad = () => {
   }
 };
 
+// PostMessage Listener for Player Progress Tracking
+const handleWindowMessage = (event: MessageEvent) => {
+  if (!event || !event.data || !props.tmdbId) return;
+
+  try {
+    const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+    const currentTime = data.currentTime || data.time || data.progress || (data.data && data.data.currentTime);
+    const duration = data.duration || (data.data && data.data.duration);
+
+    if (typeof currentTime === 'number' && currentTime > 0) {
+      updateProgress(
+        props.tmdbId, 
+        props.mediaType, 
+        currentTime, 
+        typeof duration === 'number' ? duration : undefined,
+        props.season,
+        props.episode
+      );
+    }
+  } catch (_) {}
+};
+
 onMounted(() => {
   startGraceTimer();
+  checkSavedProgress();
+  if (import.meta.client) {
+    window.addEventListener('message', handleWindowMessage);
+  }
 });
 
 onUnmounted(() => {
   clearGraceTimer();
+  if (import.meta.client) {
+    window.removeEventListener('message', handleWindowMessage);
+  }
 });
 
 watch(
@@ -385,8 +500,10 @@ watch(
   () => {
     failedProviders.value.clear();
     isUsingMirror.value = false;
+    resumeTimeOffset.value = null;
     currentState.value = 'LOADING';
     startGraceTimer();
+    checkSavedProgress();
   }
 );
 </script>

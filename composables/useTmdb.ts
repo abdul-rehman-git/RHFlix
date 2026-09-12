@@ -6,7 +6,9 @@ import type {
   TMDBPaginatedResponse, 
   Genre,
   MediaType,
-  CreditsResponse
+  CreditsResponse,
+  VideoItem,
+  VideosResponse
 } from '~/types/tmdb';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -264,6 +266,73 @@ export const useTmdb = () => {
     }
   };
 
+  // Discover Media with Multi-Filter Support (Genre, Language/Region, Sort, 18+ Adult)
+  const discoverMedia = async (options: {
+    type?: MediaType;
+    genreId?: number | null;
+    language?: string | null;
+    sortBy?: string;
+    page?: number;
+    includeAdult?: boolean;
+    adultOnly?: boolean;
+  } = {}): Promise<TMDBPaginatedResponse<MediaItem>> => {
+    const type = options.type || 'movie';
+    const page = options.page || 1;
+    const isAdultFilterActive = Boolean(options.includeAdult || options.adultOnly);
+
+    if (!isConfigured.value) {
+      const items = (type === 'movie' ? MOCK_MOVIES : MOCK_TV_SHOWS).map(item => ({
+        ...item,
+        adult: isAdultFilterActive ? true : Boolean(item.adult)
+      }));
+      return { page: 1, results: items, total_pages: 1, total_results: items.length };
+    }
+
+    const params: Record<string, any> = {
+      page,
+      sort_by: options.sortBy || 'popularity.desc'
+    };
+
+    if (options.genreId) {
+      params.with_genres = options.genreId.toString();
+    }
+
+    if (options.language) {
+      params.with_original_language = options.language;
+    }
+
+    if (isAdultFilterActive) {
+      params.include_adult = 'true';
+      // Specific erotic/softcore/adult keywords to surface true 18+ spicy & mature content (VivaMax, Erotic Thrillers, 18+ Web Series, Adult Anime)
+      const ADULT_KEYWORDS = '325693|155477|207767|362757|267122|341368|33513|360629|337153|364407|323223|190378|220370|281372|208630|293673|180540';
+      params.with_keywords = ADULT_KEYWORDS;
+      if (!options.genreId) {
+        params.without_genres = '10751';
+      }
+    }
+
+    try {
+      const res = await fetchFromTmdb<TMDBPaginatedResponse<MediaItem>>(`/discover/${type}`, params);
+      
+      // If 18+ filter is active, mark items with adult: true badge
+      let results = res.results || [];
+      if (isAdultFilterActive) {
+        results = results.map(item => ({
+          ...item,
+          adult: true
+        }));
+      }
+
+      return {
+        ...res,
+        results
+      };
+    } catch (_) {
+      const items = type === 'movie' ? MOCK_MOVIES : MOCK_TV_SHOWS;
+      return { page: 1, results: items, total_pages: 1, total_results: items.length };
+    }
+  };
+
   // Movie Details
   const getMovieDetails = async (id: number | string): Promise<MovieDetails> => {
     if (!isConfigured.value) {
@@ -397,6 +466,32 @@ export const useTmdb = () => {
     }
   };
 
+  // Videos / Trailers
+  const getVideos = async (type: MediaType, id: number | string): Promise<VideoItem[]> => {
+    if (!isConfigured.value) {
+      return [
+        {
+          id: 'mock_trailer_1',
+          iso_639_1: 'en',
+          iso_3166_1: 'US',
+          name: 'Official Trailer',
+          key: type === 'movie' ? 'YoHD9XEInc0' : 'rlR4PJn8b8I',
+          site: 'YouTube',
+          size: 1080,
+          type: 'Trailer',
+          official: true,
+          published_at: '2023-01-01T00:00:00.000Z'
+        }
+      ];
+    }
+    try {
+      const res = await fetchFromTmdb<VideosResponse>(`/${type}/${id}/videos`);
+      return res.results || [];
+    } catch (_) {
+      return [];
+    }
+  };
+
   return {
     isConfigured,
     getImageUrl,
@@ -414,6 +509,8 @@ export const useTmdb = () => {
     getSeasonDetails,
     getCredits,
     getSimilar,
+    getVideos,
+    discoverMedia,
     search
   };
 };

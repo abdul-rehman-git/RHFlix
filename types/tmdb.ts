@@ -22,6 +22,7 @@ export interface MediaItem {
   first_air_date?: string; // TV
   vote_average: number;
   vote_count: number;
+  adult?: boolean;
 }
 
 export interface MovieDetails extends MediaItem {
@@ -108,4 +109,23 @@ export interface CreditsResponse {
   crew: CrewMember[];
 }
 
+export interface VideoItem {
+  id: string;
+  iso_639_1: string;
+  iso_3166_1: string;
+  name: string;
+  key: string;
+  site: string;
+  size: number;
+  type: string;
+  official: boolean;
+  published_at: string;
+}
+
+export interface VideosResponse {
+  id: number;
+  results: VideoItem[];
+}
+
 export type { WatchHistoryItem, MyListItem } from './user';
+

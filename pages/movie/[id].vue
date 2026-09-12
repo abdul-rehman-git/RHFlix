@@ -65,15 +65,16 @@
               </p>
             </div>
 
-            <!-- Genres Pills -->
+            <!-- Genres Pills (Clickable Category Links) -->
             <div v-if="movie.genres && movie.genres.length > 0" class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2">
-              <span 
+              <NuxtLink 
                 v-for="genre in movie.genres" 
                 :key="genre.id"
-                class="px-2.5 py-1 bg-marxi-850 text-xs font-semibold text-gray-300 rounded-full border border-marxi-700"
+                :to="`/categories?type=movie&genre=${genre.id}`"
+                class="px-2.5 py-1 bg-marxi-850 hover:bg-marxi-800 text-xs font-semibold text-gray-300 hover:text-white rounded-full border border-marxi-700 hover:border-marxi-gold/50 transition-colors"
               >
                 {{ genre.name }}
-              </span>
+              </NuxtLink>
             </div>
 
             <!-- Action Buttons (Min 44px Touch Target) -->
@@ -87,6 +88,17 @@
                 </svg>
                 <span>Watch Movie</span>
               </NuxtLink>
+
+              <button 
+                v-if="trailerKey"
+                @click="isTrailerOpen = true"
+                class="px-5 py-3 sm:px-6 sm:py-3.5 bg-marxi-800 hover:bg-marxi-700 text-marxi-gold font-bold rounded-xl flex items-center space-x-2 border border-marxi-gold/30 hover:border-marxi-gold transition-all min-h-[44px] shadow-md"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 3h6a1 1 0 010 2H7a1 1 0 010-2zm0 4h6a1 1 0 010 2H7a1 1 0 010-2zm0 4h4a1 1 0 010 2H7a1 1 0 010-2z" clip-rule="evenodd" />
+                </svg>
+                <span>Watch Trailer</span>
+              </button>
 
               <button 
                 @click="toggleMyList(movie)"
@@ -182,6 +194,14 @@
 
       </div>
     </div>
+
+    <!-- Official Trailer Modal -->
+    <TrailerModal 
+      :isOpen="isTrailerOpen" 
+      :videoKey="trailerKey" 
+      :title="movie?.title" 
+      @close="isTrailerOpen = false" 
+    />
   </div>
 </template>
 
@@ -195,13 +215,15 @@ definePageMeta({
 const route = useRoute();
 const movieId = computed(() => route.params.id as string);
 
-const { getMovieDetails, getCredits, getSimilar, getImageUrl } = useTmdb();
+const { getMovieDetails, getCredits, getSimilar, getVideos, getImageUrl } = useTmdb();
 const { isInList, toggleMyList } = useMyList();
 
 const movie = ref<MovieDetails | null>(null);
 const topCast = ref<CastMember[]>([]);
 const directorName = ref<string | null>(null);
 const similarMovies = ref<MediaItem[]>([]);
+const trailerKey = ref<string | null>(null);
+const isTrailerOpen = ref(false);
 
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -227,14 +249,24 @@ const getInitials = (name: string) => {
 const loadData = async () => {
   loading.value = true;
   error.value = null;
+  trailerKey.value = null;
   try {
-    const [movieData, creditsData, similarData] = await Promise.all([
+    const [movieData, creditsData, similarData, videosData] = await Promise.all([
       getMovieDetails(movieId.value),
       getCredits('movie', movieId.value).catch(() => ({ cast: [], crew: [] })),
-      getSimilar('movie', movieId.value).catch(() => ({ results: [] }))
+      getSimilar('movie', movieId.value).catch(() => ({ results: [] })),
+      getVideos('movie', movieId.value).catch(() => [])
     ]);
 
     movie.value = movieData;
+
+    // Find official trailer or first YouTube video
+    if (videosData && videosData.length > 0) {
+      const trailer = videosData.find(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.official)) || videosData[0];
+      if (trailer && trailer.key) {
+        trailerKey.value = trailer.key;
+      }
+    }
     if (movie.value) {
       useSeoMeta({
         title: `${movie.value.title} (${movie.value.release_date?.substring(0, 4) || ''}) - Stream on RHFlix`,

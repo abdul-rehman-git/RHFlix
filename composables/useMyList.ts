@@ -5,21 +5,40 @@ const STORAGE_KEY = 'marxi_my_list';
 export const useMyList = () => {
   const myList = useState<MediaItem[]>('marxi_my_list', () => []);
 
-  onMounted(() => {
-    if (import.meta.client && myList.value.length === 0) {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            myList.value = parsed.filter(item => item && typeof item === 'object' && Boolean(item.id));
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
-          }
+  const loadFromStorage = () => {
+    if (!import.meta.client) return;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          myList.value = parsed.filter(item => item && typeof item === 'object' && Boolean(item.id));
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
         }
-      } catch (err) {
-        console.error('Error reading My List from LocalStorage:', err);
       }
+    } catch (err) {
+      console.error('Error reading My List from LocalStorage:', err);
+    }
+  };
+
+  onMounted(() => {
+    if (import.meta.client) {
+      if (myList.value.length === 0) {
+        loadFromStorage();
+      }
+
+      // Multi-Tab Synchronization
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === STORAGE_KEY) {
+          loadFromStorage();
+        }
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+      onUnmounted(() => {
+        window.removeEventListener('storage', handleStorageChange);
+      });
     }
   });
 
@@ -27,8 +46,12 @@ export const useMyList = () => {
     if (import.meta.client) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-      } catch (err) {
-        console.error('Error saving My List to LocalStorage:', err);
+      } catch (err: any) {
+        if (err.name === 'QuotaExceededError' || err.code === 22) {
+          console.warn('[Storage Error] LocalStorage quota exceeded when saving My List.');
+        } else {
+          console.error('Error saving My List to LocalStorage:', err);
+        }
       }
     }
   };
