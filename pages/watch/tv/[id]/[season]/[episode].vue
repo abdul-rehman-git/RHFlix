@@ -3,15 +3,27 @@
     
     <!-- Top Action Bar -->
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <NuxtLink 
-        :to="`/tv/${tvId}`" 
-        class="inline-flex items-center space-x-2 text-xs sm:text-sm font-semibold text-gray-300 hover:text-white bg-marxi-850 hover:bg-marxi-800 px-3.5 py-2.5 rounded-xl border border-marxi-800 transition-colors"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        <span>Back to Series Details</span>
-      </NuxtLink>
+      <div class="flex items-center space-x-2">
+        <NuxtLink 
+          :to="`/tv/${tvId}`" 
+          class="inline-flex items-center space-x-2 text-xs sm:text-sm font-semibold text-gray-300 hover:text-white bg-marxi-850 hover:bg-marxi-800 px-3.5 py-2.5 rounded-xl border border-marxi-800 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Series Details</span>
+        </NuxtLink>
+
+        <span 
+          v-if="isUnreleased"
+          class="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-lg uppercase font-black text-[10px] tracking-wider shadow-md flex items-center space-x-1"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 fill-current" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>
+          <span>Coming Soon</span>
+        </span>
+      </div>
 
       <!-- Episode Navigation (Prev / Next) -->
       <div class="flex items-center space-x-2">
@@ -41,15 +53,81 @@
 
     <!-- Playback Player Section -->
     <div class="-mx-3 sm:mx-0">
+      <!-- Loading State: NEVER Mount PlaybackPlayer while fetching data -->
+      <div 
+        v-if="loadingShow" 
+        class="relative w-full aspect-video bg-marxi-950 rounded-none sm:rounded-2xl overflow-hidden border border-marxi-800 flex flex-col items-center justify-center p-6 text-center space-y-3"
+      >
+        <div class="w-10 h-10 border-3 border-marxi-accent/30 border-t-marxi-accent rounded-full animate-spin"></div>
+        <p class="text-xs text-gray-400 font-semibold">Verifying episode air status...</p>
+      </div>
+
+      <!-- Unreleased: Official Trailer or Coming Soon Notice Container -->
+      <div v-else-if="isUnreleased" class="space-y-4">
+        <!-- Trailer Embed (if available) -->
+        <div v-if="trailerKey" class="relative w-full aspect-video bg-black rounded-none sm:rounded-2xl overflow-hidden shadow-2xl border border-amber-500/40">
+          <iframe 
+            :src="`https://www.youtube-nocookie.com/embed/${trailerKey}?autoplay=1&rel=0`"
+            class="w-full h-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <!-- No Trailer: Aesthetic Notice Card with Backdrop -->
+        <div 
+          v-else 
+          class="relative w-full aspect-video bg-marxi-950 rounded-none sm:rounded-2xl overflow-hidden border border-amber-500/30 flex flex-col items-center justify-center p-6 text-center space-y-4 shadow-2xl"
+        >
+          <img 
+            v-if="currentEpisode?.still_path || show?.backdrop_path" 
+            :src="getImageUrl(currentEpisode?.still_path || show?.backdrop_path, 'original')" 
+            :alt="show?.name"
+            class="absolute inset-0 w-full h-full object-cover opacity-20 filter blur-sm"
+          />
+          <div class="relative z-10 w-16 h-16 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="relative z-10 max-w-md space-y-2">
+            <h2 class="text-xl sm:text-2xl font-display font-black text-white tracking-tight">
+              {{ isShowUnreleased ? 'This TV Series Has Not Aired Yet' : 'This Episode Has Not Aired Yet' }}
+            </h2>
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+              Scheduled air date: <strong class="text-amber-400">{{ formatReleaseDate(isShowUnreleased ? show : currentEpisode) }}</strong>. Streaming playback will unlock once officially broadcast.
+            </p>
+          </div>
+        </div>
+
+        <!-- Explanatory Banner -->
+        <div class="p-3.5 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-200">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0"></span>
+            <span>
+              <template v-if="trailerKey">🎬 Playing the <strong>Official Trailer</strong>. </template>Streaming playback will be available on release (<strong>{{ formatReleaseDate(isShowUnreleased ? show : currentEpisode) }}</strong>).
+            </span>
+          </div>
+          <NuxtLink 
+            :to="`/tv/${tvId}`" 
+            class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg text-xs transition-colors shrink-0 text-center"
+          >
+            View Series Details
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- Released: Standard Streaming Multi-Server Player -->
       <PlaybackPlayer 
+        v-else-if="show"
         mediaType="tv" 
         :tmdbId="tvId" 
-        :season="seasonNumber"
-        :episode="episodeNumber"
-        :title="show?.name"
-        :posterPath="show?.poster_path"
-        :backdropPath="currentEpisode?.still_path || show?.backdrop_path"
-        :episodeName="currentEpisode?.name"
+        :season="seasonNumber" 
+        :episode="episodeNumber" 
+        :title="show.name" 
+        :posterPath="show.poster_path" 
+        :backdropPath="currentEpisode?.still_path || show.backdrop_path" 
+        :episodeName="currentEpisode?.name" 
       />
     </div>
 
@@ -105,14 +183,17 @@
             v-for="ep in seasonDetails.episodes"
             :key="ep.id"
             :to="`/watch/tv/${tvId}/${seasonNumber}/${ep.episode_number}`"
-            class="px-3 py-2 rounded-xl text-center text-xs font-semibold transition-all border"
+            class="px-3 py-2 rounded-xl text-center text-xs font-semibold transition-all border flex items-center justify-center space-x-1"
             :class="[
               ep.episode_number === episodeNumber
                 ? 'bg-marxi-accent text-white border-marxi-accent shadow-glow-red font-bold'
-                : 'bg-marxi-800 text-gray-300 border-marxi-700 hover:bg-marxi-700 hover:text-white'
+                : isComingSoon(ep)
+                  ? 'bg-marxi-900/60 text-amber-400/80 border-amber-500/20 hover:border-amber-500/50'
+                  : 'bg-marxi-800 text-gray-300 border-marxi-700 hover:bg-marxi-700 hover:text-white'
             ]"
           >
-            Ep {{ ep.episode_number }}
+            <span>Ep {{ ep.episode_number }}</span>
+            <span v-if="isComingSoon(ep)" class="w-1.5 h-1.5 rounded-full bg-amber-400" title="Coming Soon"></span>
           </NuxtLink>
         </div>
       </div>
@@ -125,6 +206,7 @@
 <script setup lang="ts">
 import { useTmdb } from '~/composables/useTmdb';
 import { useWatchHistory } from '~/composables/useWatchHistory';
+import { useMediaRelease } from '~/composables/useMediaRelease';
 import type { TVDetails, SeasonDetails, Episode } from '~/types/tmdb';
 
 definePageMeta({
@@ -138,16 +220,23 @@ const tvId = computed(() => route.params.id as string);
 const seasonNumber = computed(() => Number(route.params.season) || 1);
 const episodeNumber = computed(() => Number(route.params.episode) || 1);
 
-const { getTVDetails, getSeasonDetails, getImageUrl } = useTmdb();
+const { getTVDetails, getSeasonDetails, getVideos, getImageUrl } = useTmdb();
 const { addWatchHistory } = useWatchHistory();
+const { isComingSoon, formatReleaseDate } = useMediaRelease();
 
 const show = ref<TVDetails | null>(null);
+const loadingShow = ref(true);
 const seasonDetails = ref<SeasonDetails | null>(null);
 const selectedSeason = ref(seasonNumber.value);
+const trailerKey = ref<string | null>(null);
 
 const currentEpisode = computed<Episode | undefined>(() => {
   return seasonDetails.value?.episodes.find(e => e.episode_number === episodeNumber.value);
 });
+
+const isShowUnreleased = computed(() => isComingSoon(show.value));
+const isEpisodeUnreleased = computed(() => isComingSoon(currentEpisode.value));
+const isUnreleased = computed(() => isShowUnreleased.value || isEpisodeUnreleased.value);
 
 const totalEpisodesInSeason = computed(() => seasonDetails.value?.episodes.length || 0);
 
@@ -184,17 +273,32 @@ const handleSeasonChange = () => {
 };
 
 const loadShowAndSeasonData = async () => {
+  loadingShow.value = true;
   try {
-    show.value = await getTVDetails(tvId.value);
-    seasonDetails.value = await getSeasonDetails(tvId.value, seasonNumber.value);
+    const [tvData, sData, vidRes] = await Promise.all([
+      getTVDetails(tvId.value),
+      getSeasonDetails(tvId.value, seasonNumber.value),
+      getVideos('tv', tvId.value).catch(() => [])
+    ]);
+
+    show.value = tvData;
+    seasonDetails.value = sData;
     selectedSeason.value = seasonNumber.value;
+
+    const videos = Array.isArray(vidRes) ? vidRes : [];
+    const trailer = videos.find((v: any) => v.site === 'YouTube' && (v.type === 'Trailer' || v.official || v.type === 'Teaser'));
+    trailerKey.value = trailer ? trailer.key : (videos[0]?.key || null);
 
     const epName = currentEpisode.value?.name || `Episode ${episodeNumber.value}`;
 
     if (show.value) {
+      const pageTitle = isUnreleased.value
+        ? `Coming Soon: ${show.value.name} S${seasonNumber.value} E${episodeNumber.value} - RHFlix`
+        : `Watching ${show.value.name} S${seasonNumber.value} E${episodeNumber.value} (${epName}) - RHFlix`;
+
       useSeoMeta({
-        title: `Watching ${show.value.name} S${seasonNumber.value} E${episodeNumber.value} (${epName}) - RHFlix`,
-        ogTitle: `Watching ${show.value.name} S${seasonNumber.value} E${episodeNumber.value} - RHFlix`,
+        title: pageTitle,
+        ogTitle: pageTitle,
         description: currentEpisode.value?.overview || show.value.overview,
         ogDescription: currentEpisode.value?.overview || show.value.overview,
         ogUrl: `https://rhflix.rehmanwebs.com/watch/tv/${show.value.id}/${seasonNumber.value}/${episodeNumber.value}`
@@ -206,19 +310,24 @@ const loadShowAndSeasonData = async () => {
         ]
       });
 
-      addWatchHistory({
-        tmdbId: show.value.id,
-        type: 'tv',
-        title: show.value.name,
-        posterPath: show.value.poster_path,
-        backdropPath: currentEpisode.value?.still_path || show.value.backdrop_path,
-        season: seasonNumber.value,
-        episode: episodeNumber.value,
-        episodeName: epName
-      });
+      // Only add to watch history if released!
+      if (!isUnreleased.value) {
+        addWatchHistory({
+          tmdbId: show.value.id,
+          type: 'tv',
+          title: show.value.name,
+          posterPath: show.value.poster_path,
+          backdropPath: currentEpisode.value?.still_path || show.value.backdrop_path,
+          season: seasonNumber.value,
+          episode: episodeNumber.value,
+          episodeName: epName
+        });
+      }
     }
   } catch (err) {
     console.error('Error fetching watch TV data:', err);
+  } finally {
+    loadingShow.value = false;
   }
 };
 

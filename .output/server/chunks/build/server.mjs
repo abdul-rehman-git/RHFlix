@@ -1,8 +1,8 @@
 import process from 'node:process';globalThis._importMeta_=globalThis._importMeta_||{url:"file:///_entry.js",env:process.env};import { defineComponent, ref, inject, h, hasInjectionContext, getCurrentInstance, readonly, toRef, isRef, computed, shallowRef, resolveComponent, getCurrentScope, unref, isVNode, createCommentVNode, useSSRContext, Suspense, Fragment, createApp, watch, mergeProps, withCtx, createVNode, createTextVNode, openBlock, createBlock, toDisplayString, provide, shallowReactive, onErrorCaptured, onServerPrefetch, resolveDynamicComponent, reactive, effectScope, defineAsyncComponent, isReadonly, isShallow, isReactive, toRaw } from 'vue';
 import { p as parseQuery, k as getContext, l as hasProtocol, m as joinURL, n as parseURL, e as encodePath, o as decodePath, q as isScriptProtocol, w as withQuery, r as withTrailingSlash, t as withoutTrailingSlash, v as sanitizeStatusCode, $ as $fetch$1, x as createHooks, c as createError$1, y as executeAsync, z as defu } from '../nitro/nitro.mjs';
-import { b as baseURL } from '../routes/renderer.mjs';
+import { b as baseURL, p as publicAssetsURL } from '../routes/renderer.mjs';
 import { RouterView, createMemoryHistory, createRouter, START_LOCATION } from 'vue-router';
-import { ssrRenderAttrs, ssrRenderComponent, ssrInterpolate, ssrRenderAttr, ssrRenderList, ssrRenderClass, ssrRenderSuspense, ssrRenderVNode } from 'vue/server-renderer';
+import { ssrRenderAttrs, ssrRenderComponent, ssrRenderAttr, ssrInterpolate, ssrRenderList, ssrRenderClass, ssrRenderSuspense, ssrRenderVNode } from 'vue/server-renderer';
 import 'node:http';
 import 'node:https';
 import 'node:events';
@@ -590,63 +590,63 @@ const _routes = [
         name: "tv-id",
         path: ":id()",
         meta: __nuxt_page_meta$3 || {},
-        component: () => import('./_id_-DsgZUZTs.mjs')
+        component: () => import('./_id_-WAhazsws.mjs')
       },
       {
         name: "tv",
         path: "",
-        component: () => import('./index-BlWJQDLe.mjs')
+        component: () => import('./index-DrWf4R5m.mjs')
       }
     ]
   },
   {
     name: "index",
     path: "/",
-    component: () => import('./index-DJHQIj2p.mjs')
+    component: () => import('./index-BNEVswmZ.mjs')
   },
   {
     name: "movies",
     path: "/movies",
-    component: () => import('./movies-BsqY1oT2.mjs')
+    component: () => import('./movies-DMfxwBNS.mjs')
   },
   {
     name: "search",
     path: "/search",
-    component: () => import('./search-DrH78krw.mjs')
+    component: () => import('./search-B5gTJE5g.mjs')
   },
   {
     name: "my-list",
     path: "/my-list",
-    component: () => import('./my-list-DTgVYVX9.mjs')
+    component: () => import('./my-list-DwO-yHTa.mjs')
   },
   {
     name: "categories",
     path: "/categories",
-    component: () => import('./categories-CsA6zKft.mjs')
+    component: () => import('./categories-DX2zeilw.mjs')
   },
   {
     name: "movie-id",
     path: "/movie/:id()",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./_id_-BJimwjkW.mjs')
+    component: () => import('./_id_-C5IojJ7r.mjs')
   },
   {
     name: "watch-tv-id",
     path: "/watch/tv/:id()",
-    component: () => import('./_id_-CiZwpX8s.mjs'),
+    component: () => import('./_id_-DyCnjdaO.mjs'),
     children: [
       {
         name: "watch-tv-id-season-episode",
         path: ":season()/:episode()",
         meta: __nuxt_page_meta || {},
-        component: () => import('./_episode_-BcCOmT66.mjs')
+        component: () => import('./_episode_-919xHi-4.mjs')
       }
     ]
   },
   {
     name: "watch-movie-id",
     path: "/watch/movie/:id()",
-    component: () => import('./_id_-BoOlwYh3.mjs')
+    component: () => import('./_id_-sfgR9Muh.mjs')
   }
 ];
 const validate = /* @__PURE__ */ defineNuxtRouteMiddleware(async (to) => {
@@ -1251,6 +1251,7 @@ function applyTrailingSlashBehavior(to, trailingSlash) {
   }
   return normalizeFn(to, true);
 }
+const _imports_0 = publicAssetsURL("/rh-logo.png");
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p";
 const SVG_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450" fill="%230e1017"%3E%3Crect width="100%25" height="100%25" fill="%230e1017"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%23e50914" font-weight="bold"%3EMARXI%3C/text%3E%3C/svg%3E';
@@ -1783,16 +1784,18 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
       }, _attrs))}><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="flex items-center justify-between"><div class="flex items-center space-x-8">`);
       _push(ssrRenderComponent(_component_NuxtLink, {
         to: "/",
-        class: "flex items-center space-x-2 group"
+        class: "flex items-center space-x-2.5 group"
       }, {
         default: withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(`<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-marxi-accent to-red-500 flex items-center justify-center shadow-glow-red group-hover:scale-105 transition-transform duration-300"${_scopeId}><span class="font-display font-black text-base text-white tracking-tighter"${_scopeId}>RH</span></div><span class="font-display font-extrabold text-2xl tracking-tight text-white group-hover:text-red-400 transition-colors"${_scopeId}> RHFlix<span class="text-marxi-accent"${_scopeId}>.</span></span>`);
+            _push2(`<img${ssrRenderAttr("src", _imports_0)} alt="RHFlix Logo" class="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_12px_rgba(229,9,20,0.5)]"${_scopeId}><span class="font-display font-extrabold text-2xl tracking-tight text-white group-hover:text-red-400 transition-colors"${_scopeId}> RHFlix<span class="text-marxi-accent"${_scopeId}>.</span></span>`);
           } else {
             return [
-              createVNode("div", { class: "w-9 h-9 rounded-xl bg-gradient-to-tr from-marxi-accent to-red-500 flex items-center justify-center shadow-glow-red group-hover:scale-105 transition-transform duration-300" }, [
-                createVNode("span", { class: "font-display font-black text-base text-white tracking-tighter" }, "RH")
-              ]),
+              createVNode("img", {
+                src: _imports_0,
+                alt: "RHFlix Logo",
+                class: "h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_12px_rgba(229,9,20,0.5)]"
+              }),
               createVNode("span", { class: "font-display font-extrabold text-2xl tracking-tight text-white group-hover:text-red-400 transition-colors" }, [
                 createTextVNode(" RHFlix"),
                 createVNode("span", { class: "text-marxi-accent" }, ".")
@@ -2457,7 +2460,7 @@ const _export_sfc = (sfc, props) => {
 const _sfc_main$3 = {};
 function _sfc_ssrRender(_ctx, _push, _parent, _attrs) {
   const _component_NuxtLink = __nuxt_component_0$1;
-  _push(`<footer${ssrRenderAttrs(mergeProps({ class: "bg-marxi-950 border-t border-marxi-800/80 pt-12 pb-8 text-gray-400 text-sm" }, _attrs))}><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"><div class="md:col-span-2 space-y-4"><div class="flex items-center space-x-2"><div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-marxi-accent to-red-500 flex items-center justify-center shadow-glow-red"><span class="font-display font-black text-xs text-white tracking-tight">RH</span></div><span class="font-display font-extrabold text-xl text-white"> RHFlix<span class="text-marxi-accent">.</span></span></div><p class="text-gray-400 max-w-sm text-xs leading-relaxed"> Stream your favorite movies, top-rated TV series, trending blockbusters, and exclusive releases online with fast, high-definition streaming on RHFlix. </p><div class="flex items-center space-x-3 text-xs text-gray-500"><span>Ultra HD Playback</span> • <span>Fast Streaming</span> • <span>Multi-Device</span></div></div><div><h4 class="text-white font-semibold text-xs tracking-wider uppercase mb-3">Quick Navigation</h4><ul class="space-y-2 text-xs"><li>`);
+  _push(`<footer${ssrRenderAttrs(mergeProps({ class: "bg-marxi-950 border-t border-marxi-800/80 pt-12 pb-8 text-gray-400 text-sm" }, _attrs))}><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"><div class="md:col-span-2 space-y-4"><div class="flex items-center space-x-2.5"><img${ssrRenderAttr("src", _imports_0)} alt="RHFlix Logo" class="h-7 sm:h-8 w-auto object-contain"><span class="font-display font-extrabold text-xl text-white"> RHFlix<span class="text-marxi-accent">.</span></span></div><p class="text-gray-400 max-w-sm text-xs leading-relaxed"> Stream your favorite movies, top-rated TV series, trending blockbusters, and exclusive releases online with fast, high-definition streaming on RHFlix. </p><div class="flex items-center space-x-3 text-xs text-gray-500"><span>Ultra HD Playback</span> • <span>Fast Streaming</span> • <span>Multi-Device</span></div></div><div><h4 class="text-white font-semibold text-xs tracking-wider uppercase mb-3">Quick Navigation</h4><ul class="space-y-2 text-xs"><li>`);
   _push(ssrRenderComponent(_component_NuxtLink, {
     to: "/",
     class: "hover:text-white transition-colors"

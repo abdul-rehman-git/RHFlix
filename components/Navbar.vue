@@ -13,10 +13,12 @@
         <!-- Left Section: Logo & Desktop Links -->
         <div class="flex items-center space-x-8">
           <!-- Logo -->
-          <NuxtLink to="/" class="flex items-center space-x-2 group">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-marxi-accent to-red-500 flex items-center justify-center shadow-glow-red group-hover:scale-105 transition-transform duration-300">
-              <span class="font-display font-black text-base text-white tracking-tighter">RH</span>
-            </div>
+          <NuxtLink to="/" class="flex items-center space-x-2.5 group">
+            <img 
+              src="/rh-logo.png" 
+              alt="RHFlix Logo" 
+              class="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_12px_rgba(229,9,20,0.5)]" 
+            />
             <span class="font-display font-extrabold text-2xl tracking-tight text-white group-hover:text-red-400 transition-colors">
               RHFlix<span class="text-marxi-accent">.</span>
             </span>

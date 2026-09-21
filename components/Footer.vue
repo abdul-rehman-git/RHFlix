@@ -5,10 +5,12 @@
         
         <!-- Brand Info -->
         <div class="md:col-span-2 space-y-4">
-          <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-marxi-accent to-red-500 flex items-center justify-center shadow-glow-red">
-              <span class="font-display font-black text-xs text-white tracking-tight">RH</span>
-            </div>
+          <div class="flex items-center space-x-2.5">
+            <img 
+              src="/rh-logo.png" 
+              alt="RHFlix Logo" 
+              class="h-7 sm:h-8 w-auto object-contain" 
+            />
             <span class="font-display font-extrabold text-xl text-white">
               RHFlix<span class="text-marxi-accent">.</span>
             </span>

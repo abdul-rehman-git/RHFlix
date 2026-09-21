@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: false },
+  telemetry: false,
 
   modules: [
     '@nuxtjs/tailwindcss'
@@ -45,6 +46,11 @@ export default defineNuxtConfig({
         { name: 'twitter:description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD.' }
       ],
       link: [
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'shortcut icon', href: '/favicon.ico' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
         { rel: 'canonical', href: 'https://rhflix.rehmanwebs.com/' },
         { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
