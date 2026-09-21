@@ -147,8 +147,8 @@ import type { MediaItem, WatchHistoryItem } from '~/types/tmdb';
 useSeoMeta({
   title: 'RHFlix - Stream Unlimited Movies & TV Shows',
   ogTitle: 'RHFlix - Stream Unlimited Movies & TV Shows',
-  description: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in full HD.',
-  ogDescription: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in full HD.',
+  description: 'Watch movies, TV series, and trending blockbusters online in 4K HDR. Enjoy fast, bufferless cinema entertainment anytime on RHFlix.',
+  ogDescription: 'Watch movies, TV series, and trending blockbusters online in 4K HDR. Enjoy fast, bufferless cinema entertainment anytime on RHFlix.',
   ogUrl: 'https://rhflix.rehmanwebs.com/',
   ogType: 'website',
   twitterCard: 'summary_large_image'
@@ -166,7 +166,7 @@ useHead({
         '@type': 'WebSite',
         'name': 'RHFlix',
         'url': 'https://rhflix.rehmanwebs.com/',
-        'description': 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in full HD.',
+        'description': 'Watch movies, TV series, and trending blockbusters online in 4K HDR. Enjoy fast, bufferless cinema entertainment anytime on RHFlix.',
         'potentialAction': {
           '@type': 'SearchAction',
           'target': 'https://rhflix.rehmanwebs.com/search?q={search_term_string}',

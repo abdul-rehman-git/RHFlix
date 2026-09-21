@@ -16,7 +16,7 @@
             </span>
           </div>
           <p class="text-gray-400 max-w-sm text-xs leading-relaxed">
-            Stream your favorite movies, top-rated TV series, trending blockbusters, and exclusive releases online with fast, high-definition streaming on RHFlix.
+            Watch movies, TV series, and trending blockbusters online in 4K HDR. Enjoy fast, bufferless cinema entertainment anytime on RHFlix.
           </p>
           <div class="flex items-center space-x-3 text-xs text-gray-500">
             <span>Ultra HD Playback</span> • <span>Fast Streaming</span> • <span>Multi-Device</span>

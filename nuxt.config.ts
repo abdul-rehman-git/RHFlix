@@ -27,7 +27,7 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
-        { name: 'description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD. Fast, dynamic, cinematic OTT streaming platform.' },
+        { name: 'description', content: 'Watch movies, TV series, and trending blockbusters online in 4K HDR. Enjoy fast, bufferless cinema entertainment anytime on RHFlix.' },
         { name: 'theme-color', content: '#090a0f' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
@@ -40,12 +40,15 @@ export default defineNuxtConfig({
         { property: 'og:type', content: 'website' },
         { property: 'og:url', content: 'https://rhflix.rehmanwebs.com/' },
         { property: 'og:title', content: 'RHFlix - Stream Unlimited Movies & TV Shows' },
-        { property: 'og:description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD.' },
+        { property: 'og:description', content: 'Watch movies, TV series, and trending blockbusters online in 4K HDR. Enjoy fast, bufferless cinema entertainment anytime on RHFlix.' },
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'RHFlix - Stream Unlimited Movies & TV Shows' },
-        { name: 'twitter:description', content: 'Stream your favorite movies, top TV series, and trending blockbusters online on RHFlix in HD.' }
+        { name: 'twitter:description', content: 'Watch movies, TV series, and trending blockbusters online in 4K HDR. Enjoy fast, bufferless cinema entertainment anytime on RHFlix.' }
       ],
       link: [
+        { rel: 'icon', type: 'image/png', sizes: '48x48', href: '/favicon-48x48.png' },
+        { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon-96x96.png' },
+        { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/icon-192.png' },
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
